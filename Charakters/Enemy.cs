@@ -21,6 +21,5 @@ public class Enemy : Entity
     /// <summary>
     /// Attackiert den mitgegeben Charakter und zieht die Defence von der Attacke ab.
     /// </summary>
-    /// <param name="defender"></param>
-   
+    /// <param name="defender"></param>   
 }

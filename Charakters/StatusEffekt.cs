@@ -1,4 +1,6 @@
 ﻿
+using Game.Combat;
+
 namespace Game.Charakters;
 
 public class StatusEffekt
@@ -16,26 +18,21 @@ public class StatusEffekt
         Value = value;
     }
 
-    public void ApplyStatusAffect(Entity target)
+    public Fight.ActionHistoryEntry ApplyStatusAffect(Entity target)
     {
         double damage = 0;
         if (Duration < 1)
-            return;
+            RemoveElapsedStatusEffect(target);
+
         damage = target.CurrentHealth > Value ? Value : target.CurrentHealth;
         target.CurrentHealth -= damage;
         Duration--;
-        // message+= ($"Ich {attacker.Name} habe {defender.Name} ");
-        // Console.ForegroundColor = ConsoleColor.Green;
-        // Console.Write($"{damage}");
-        // Console.ForegroundColor = ConsoleColor.White;
-        // Console.WriteLine($" Giftschaden hinzugefügt. ({Duration})");
-        // Console.WriteLine();
+        return new Fight.ActionHistoryEntry(null, Fight.PassiveActionEnum.ApplyStatusEffect, null, [target], Duration: Duration, Value: Value);
     }
 
-    public void RemoveElapsedStatusEffect(Player charakter)
+    public void RemoveElapsedStatusEffect(Entity target)
     {
-        if (Duration < 1)
-            charakter.StatusEffekts.Remove(this);
+        target.StatusEffekts.Remove(this);
     }
 
     public override string ToString()

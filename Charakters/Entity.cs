@@ -19,7 +19,6 @@ public abstract class Entity
     public virtual List<Item> Inventory { get; set; }
     public virtual List<StatusEffekt> StatusEffekts { get; set; }
     public virtual MetaProgression MetaProgression { get; set; }
-
     public virtual Fight.ActionHistoryEntry Attack(Entity defender)
     {
         ActualDamage = GetAttackValue() - defender.GetDefenseValue();
@@ -28,8 +27,7 @@ public abstract class Entity
         defender.CurrentHealth -= ActualDamage;
         defender.CurrentHealth = defender.CurrentHealth < 0 ? 0 : defender.CurrentHealth;
         defender.InDefensePosition = false;
-        return new Fight.ActionHistoryEntry(Fight.PlayerActionEnum.Attack, this, [defender]);
-
+        return new Fight.ActionHistoryEntry(Fight.ActivePlayerActionEnum.Attack, null, this, [defender]);
     }
     public virtual Fight.ActionHistoryEntry SpecialAttack(Entity defender)
     {
@@ -39,12 +37,12 @@ public abstract class Entity
         defender.CurrentHealth -= ActualDamage;
         defender.CurrentHealth = defender.CurrentHealth < 0 ? 0 : defender.CurrentHealth;
         defender.InDefensePosition = false;
-        return new Fight.ActionHistoryEntry(Fight.PlayerActionEnum.SpecialAttack, this, [defender]);
+        return new Fight.ActionHistoryEntry(Fight.ActivePlayerActionEnum.SpecialAttack, null, this, [defender]);
     }
     public virtual Fight.ActionHistoryEntry GetInDefensePosition()
     {
         InDefensePosition = true;
-        return new Fight.ActionHistoryEntry(Fight.PlayerActionEnum.Defend, this, []);
+        return new Fight.ActionHistoryEntry(Fight.ActivePlayerActionEnum.Defend, null, this, []);
     }
     public virtual double GetAttackValue()
     {

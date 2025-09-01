@@ -55,12 +55,13 @@ class FightMenu : Menu
 
         while (!fight.isGameFinished)
         {
-            fight.ApplyStatusEffects();
+            var historyEntry = fight.ApplyStatusEffects();
             EnemyGenerator enemyGenerator = new EnemyGenerator(new Ork(), 1, fight);
             if (fight.isLevelFinished)
                 fight.CreateNewEnemies(enemyGenerator);
             DisplayEnteties(player, fight);
             PrintMenuRoundAndTurn(fight);
+            PrintStatusEffects(historyEntry);
             PrintMenuPlayerMove(fight);
             DisplayEnteties(player, fight);
             PrintMenuRoundAndTurn(fight);
@@ -102,6 +103,19 @@ class FightMenu : Menu
         Console.WriteLine($"Runde: {fight.Round} Zug: {fight.Turn}                          ");
         Console.ForegroundColor = ConsoleColor.White;
     }
+
+    private void PrintStatusEffects(List<ActionHistoryEntry> historyEntrys)
+    {
+        foreach (var historyEntry in historyEntrys)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write($"{historyEntry.Value}");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine($" Giftschaden wurden {historyEntry.Target[0].Name} hinzugefügt. (Runden: {historyEntry.Duration}) verbleibend.");
+            Console.WriteLine();
+        }
+    }
+
     private void PrintMenuEnemyMove(Fight fight)
     {
         Console.WriteLine("Der/Die Gegner ist/sind am Zug.");
@@ -117,17 +131,17 @@ class FightMenu : Menu
         var options = fight.GetAvailableOptions();
         var choice = GetUserInputs(options, fight, out PlayerChoice itemMenuChoice, out bool noItemUsed);
 
-        if (choice.Action == PlayerActionEnum.UseItem && noItemUsed)
+        if (choice.Action == ActivePlayerActionEnum.UseItem && noItemUsed)
         {
             DisplayEnteties(fight.Player, fight);
             PrintMenuRoundAndTurn(fight);
             PrintMenuPlayerMove(fight);
         }
 
-        if (choice.Action == PlayerActionEnum.UseItem)
+        if (choice.Action == ActivePlayerActionEnum.UseItem)
             historyEntry = fight.PlayerMoveForRound(itemMenuChoice);
 
-        if (choice.Action != PlayerActionEnum.UseItem)
+        if (choice.Action != ActivePlayerActionEnum.UseItem)
             historyEntry = fight.PlayerMoveForRound(choice);
         PrintHistoryEntry(historyEntry);
     }
@@ -137,44 +151,59 @@ class FightMenu : Menu
         if (historyEntry == null)
             return;
 
-        switch (historyEntry.Action)
+        if (historyEntry.PassiveAction != null)
         {
-            case PlayerActionEnum.Attack:
-                Console.WriteLine($"Ich {historyEntry.Initiator.Name} greife mit: {historyEntry.Initiator.GetAttackValue():F2} AttackDamage {historyEntry.Target[0].Name} an!");
-                Console.Write($"{historyEntry.Target[0].Name} bekommt: ");
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write($"{historyEntry.Initiator.ActualDamage:F2} ");
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine("AttackDamage!");
-                Console.WriteLine();
-                Console.Write("Drücke [Enter] für den nächsten Zug.");
-                Console.ReadKey();
-                break;
-            case PlayerActionEnum.SpecialAttack:
-                Console.WriteLine($"Ich {historyEntry.Initiator.Name} greife mit meiner Spezialattacke und: {historyEntry.Initiator.GetSpecialAttackValue():F2} AttackDamage {historyEntry.Target[0].Name} an!");
-                Console.Write($"{historyEntry.Target[0].Name} bekommt: ");
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write($"{historyEntry.Initiator.ActualDamage:F2} ");
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine("AttackDamage!");
-                Console.WriteLine();
-                Console.Write("Drücke [Enter] für den nächsten Zug.");
-                Console.ReadKey();
-                break;
+            switch (historyEntry.PassiveAction)
+            {
+                case PassiveActionEnum.ApplyStatusEffect:
 
-            case PlayerActionEnum.Defend:
-                Console.WriteLine($"Ich {historyEntry.Initiator.Name} gehe in die AbwehrPosition und bekomme bei meinem nächsten Angriff nur 50% Schaden.");
-                Console.WriteLine();
-                Console.Write("Drücke [Enter] für den nächsten Zug.");
-                Console.ReadKey();
-                break;
+                    break;
+            }
+        }
 
-            case PlayerActionEnum.UseItem:
-                Console.WriteLine($"Ich {historyEntry.Initiator.Name} nutze {historyEntry.Item.Name} mit dem Wert: {historyEntry.Item.Value}.");
-                Console.WriteLine();
-                Console.Write("Drücke [Enter] für den nächsten Zug.");
-                Console.ReadKey();
-                break;
+
+
+        if (historyEntry.ActiveAction != null)
+        {
+            switch (historyEntry.ActiveAction)
+            {
+                case ActivePlayerActionEnum.Attack:
+                    Console.WriteLine($"Ich {historyEntry.Initiator.Name} greife mit: {historyEntry.Initiator.GetAttackValue():F2} AttackDamage {historyEntry.Target[0].Name} an!");
+                    Console.Write($"{historyEntry.Target[0].Name} bekommt: ");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write($"{historyEntry.Initiator.ActualDamage:F2} ");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine("AttackDamage!");
+                    Console.WriteLine();
+                    Console.Write("Drücke [Enter] für den nächsten Zug.");
+                    Console.ReadKey();
+                    break;
+                case ActivePlayerActionEnum.SpecialAttack:
+                    Console.WriteLine($"Ich {historyEntry.Initiator.Name} greife mit meiner Spezialattacke und: {historyEntry.Initiator.GetSpecialAttackValue():F2} AttackDamage {historyEntry.Target[0].Name} an!");
+                    Console.Write($"{historyEntry.Target[0].Name} bekommt: ");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write($"{historyEntry.Initiator.ActualDamage:F2} ");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine("AttackDamage!");
+                    Console.WriteLine();
+                    Console.Write("Drücke [Enter] für den nächsten Zug.");
+                    Console.ReadKey();
+                    break;
+
+                case ActivePlayerActionEnum.Defend:
+                    Console.WriteLine($"Ich {historyEntry.Initiator.Name} gehe in die AbwehrPosition und bekomme bei meinem nächsten Angriff nur 50% Schaden.");
+                    Console.WriteLine();
+                    Console.Write("Drücke [Enter] für den nächsten Zug.");
+                    Console.ReadKey();
+                    break;
+
+                case ActivePlayerActionEnum.UseItem:
+                    Console.WriteLine($"Ich {historyEntry.Initiator.Name} nutze {historyEntry.Item.Name} mit dem Wert: {historyEntry.Item.Value}.");
+                    Console.WriteLine();
+                    Console.Write("Drücke [Enter] für den nächsten Zug.");
+                    Console.ReadKey();
+                    break;
+            }
         }
     }
 
@@ -188,23 +217,23 @@ class FightMenu : Menu
 
         // User Input holen
         int choiceNumber = GetUserInputNumber();
-        while (!Enum.IsDefined(typeof(PlayerActionEnum), choiceNumber))
+        while (!Enum.IsDefined(typeof(ActivePlayerActionEnum), choiceNumber))
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("Gib eine Gültige Zahl ein!");
             Console.ForegroundColor = ConsoleColor.White;
             choiceNumber = GetUserInputNumber();
         }
-        var action = (PlayerActionEnum)choiceNumber;
+        var action = (ActivePlayerActionEnum)choiceNumber;
 
         var availableTargets = fight.GetAvailableTargets(action);
 
-        if (action == PlayerActionEnum.UseItem)
+        if (action == ActivePlayerActionEnum.UseItem)
         {
             Menu nextMenu = new UseItemMenu(fight.Player, out noItemUsed, out choice);
         }
 
-        if (action == PlayerActionEnum.Flee)
+        if (action == ActivePlayerActionEnum.Flee)
         {
             SaveAndLoadJson.SaveFight(fight);
             SaveAndLoadJson.SaveGame(fight.Player);

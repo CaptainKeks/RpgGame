@@ -8,9 +8,10 @@ namespace Game.Items
         public HeilTrank(string name, int count, double value) : base(name, count, value) { }
 
         public override string Name { get; set; } = "Heiltrank";
-        public override string Description { get; set; } = "Ein Rotes Blubberndes Getränk das 30 Leben wiederherstellt.";
+        public override string Description => "Ein Rotes Blubberndes Getränk das 30 Leben wiederherstellt.";
         public override int Count { get; set; } = 3;
         public override double Value { get; set; } = 30;
+        public override int Duration { get; set; } = 0;
 
         public override Fight.ActionHistoryEntry UseItem(Entity target, Entity enemy, out bool noItemUsed)
         {
@@ -28,7 +29,7 @@ namespace Game.Items
                     Console.ForegroundColor = ConsoleColor.White;
                     noItemUsed = false;
                     Console.ReadKey();
-                    return new Fight.ActionHistoryEntry(Fight.PlayerActionEnum.UseItem, target, [target], this);
+                    return new Fight.ActionHistoryEntry(Fight.ActivePlayerActionEnum.UseItem, null, target, [target], this);
                 }
                 else
                 {
@@ -37,7 +38,7 @@ namespace Game.Items
                     Console.ForegroundColor = ConsoleColor.White;
                     noItemUsed = true;
                     Console.ReadKey();
-                    return new Fight.ActionHistoryEntry(Fight.PlayerActionEnum.UseItem, target, [target], this);
+                    return new Fight.ActionHistoryEntry(Fight.ActivePlayerActionEnum.UseItem, null, target, [target], this);
                 }
             }
             else
@@ -49,7 +50,7 @@ namespace Game.Items
                 Console.ReadKey();
             }
 
-            return new Fight.ActionHistoryEntry(Fight.PlayerActionEnum.UseItem, target, [target], this);
+            return new Fight.ActionHistoryEntry(Fight.ActivePlayerActionEnum.UseItem, null, target, [target], this);
         }
     }
 }

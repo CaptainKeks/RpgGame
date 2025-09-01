@@ -6,16 +6,16 @@ namespace Game.Items;
 
 class GiftTrank : Item
 {
-    public GiftTrank(string name, int count, int duration, double value) : base(name, count, value)
+    public GiftTrank(string name, int count, double value, int? overrideDuration = null) : base(name, count, value)
     {
-        Duration = duration;
+        Duration = overrideDuration ?? Duration;
     }
 
-    public static int Duration { get; set; }
+    public override int Duration { get; set; } = 3;
     public override string Name { get; set; }
-    public override string Description { get; set; } = $"Ein Grün Blubberndes Getränk das 5 Leben pro Runde schaden macht für {Duration} Runden.";
+    public override string Description => $"Ein Grün Blubberndes Getränk das 5 Leben pro Runde schaden macht für {Duration} Runden.";
     public override int Count { get; set; }
-    public override double Value { get; set; }
+    public override double Value { get; set; } = 5;
 
     public override Fight.ActionHistoryEntry UseItem(Entity initiator, Entity target, out bool noItemUsed)
     {
@@ -26,7 +26,7 @@ class GiftTrank : Item
             if (target.StatusEffekts.Count < 1)
             {
                 noItemUsed = false;
-                target.StatusEffekts.Add(new StatusEffekt("Gift", "Fügt jede Runde dem Gegner 5 Schaden zu kann gestäckt werden.", Duration, 5));
+                target.StatusEffekts.Add(new StatusEffekt("Gift", "Fügt jede Runde dem Gegner 5 Schaden zu kann gestäckt werden.", Duration, Value));
                 Count--;
                 Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine($"Wirke GiftTrank auf {target.Name} für {Duration} Runden.");
@@ -49,6 +49,6 @@ class GiftTrank : Item
             Console.ReadKey();
             noItemUsed = true;
         }
-            return new Fight.ActionHistoryEntry(Fight.PlayerActionEnum.UseItem, initiator, [target], this);
+        return new Fight.ActionHistoryEntry(Fight.ActivePlayerActionEnum.UseItem, null, initiator, [target], this);
     }
 }

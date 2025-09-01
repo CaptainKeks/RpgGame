@@ -38,11 +38,11 @@ class UseItemMenu : Menu
             switch (input)
             {
                 case "0":
-                    historyEntry = new PlayerChoice(PlayerActionEnum.UseItem, player, [], player.Inventory[id]);
+                    historyEntry = new PlayerChoice(ActivePlayerActionEnum.UseItem, player, [], player.Inventory[id]);
                     validInput = true;
                     break;
                 case "1":
-                    historyEntry = new PlayerChoice(PlayerActionEnum.UseItem, player, [], player.Inventory[id]);
+                    historyEntry = new PlayerChoice(ActivePlayerActionEnum.UseItem, player, [], player.Inventory[id]);
                     validInput = true;
                     break;
                 case "2":

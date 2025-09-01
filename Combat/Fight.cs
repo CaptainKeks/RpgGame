@@ -47,24 +47,24 @@ public class Fight
 
     public AvailableOptions GetAvailableOptions()
     {
-        List<PlayerActionEnum> playerActionEnums = Enum.GetValues<PlayerActionEnum>()
-                                                       .Cast<PlayerActionEnum>().ToList();
+        List<ActivePlayerActionEnum> playerActionEnums = Enum.GetValues<ActivePlayerActionEnum>()
+                                                       .Cast<ActivePlayerActionEnum>().ToList();
 
         return new AvailableOptions(Player, playerActionEnums);
     }
 
-    public List<Entity> GetAvailableTargets(PlayerActionEnum action)
+    public List<Entity> GetAvailableTargets(ActivePlayerActionEnum action)
     {
-        if (action == PlayerActionEnum.Attack)
+        if (action == ActivePlayerActionEnum.Attack)
             return [.. Enemies];
 
-        if (action == PlayerActionEnum.SpecialAttack)
+        if (action == ActivePlayerActionEnum.SpecialAttack)
             return [.. Enemies];
 
-        if (action == PlayerActionEnum.Defend)
+        if (action == ActivePlayerActionEnum.Defend)
             return [Player];
 
-        else if (action == PlayerActionEnum.UseItem)
+        else if (action == ActivePlayerActionEnum.UseItem)
             return Entities;
 
         else
@@ -80,19 +80,19 @@ public class Fight
 
         switch (decision.Action)
         {
-            case PlayerActionEnum.Attack:
+            case ActivePlayerActionEnum.Attack:
                 historyEntry = Player.Attack(decision.Target.Last());
                 break;
 
-            case PlayerActionEnum.SpecialAttack:
+            case ActivePlayerActionEnum.SpecialAttack:
                 historyEntry = Player.SpecialAttack(decision.Target.Last());
                 break;
 
-            case PlayerActionEnum.Defend:
+            case ActivePlayerActionEnum.Defend:
                 historyEntry = Player.GetInDefensePosition();
                 break;
 
-            case PlayerActionEnum.UseItem:
+            case ActivePlayerActionEnum.UseItem:
                 historyEntry = decision.Item.UseItem(Player, Enemies[0], out _);
                 break;
         }
@@ -151,17 +151,21 @@ public class Fight
         return list;
     }
 
-    public void ApplyStatusEffects()
+    public List<ActionHistoryEntry> ApplyStatusEffects()
     {
+        var list = new List<ActionHistoryEntry>();
+        ActionHistoryEntry? historyEntry = null;
         foreach (Entity entity in Entities)
         {
             var statusEffects = entity.StatusEffekts;
             foreach (var effect in statusEffects)
             {
-                effect.ApplyStatusAffect(entity);
+                historyEntry = effect.ApplyStatusAffect(entity);
+                list.Add(historyEntry);
             }
             entity.StatusEffekts = statusEffects.Where(effect => effect.Duration > 0).ToList();
         }
+        return list;
     }
 
     private void TryIfHealthIsZero(Player player, List<Enemy> enemies)
@@ -221,9 +225,9 @@ public class Fight
     // später vielleicht statt enum (Attack, SpecialAttack, Defend) ... -> IAction
     // So kann man verschiedene Attacken, bzw. Items gleich mit übergeben
     // so fällt auch arg Item weg
-    public record PlayerChoice(PlayerActionEnum Action, Entity Initiator, List<Entity> Target, Item? Item = null);
+    public record PlayerChoice(ActivePlayerActionEnum Action, Entity Initiator, List<Entity> Target, Item? Item = null);
 
-    public enum PlayerActionEnum
+    public enum ActivePlayerActionEnum
     {
         Attack = 1,
         SpecialAttack = 2,
@@ -231,9 +235,12 @@ public class Fight
         UseItem = 4,
         Flee = 5
     }
-
-    public record AvailableOptions(Player Player, List<PlayerActionEnum> Actions);
+    public enum PassiveActionEnum
+    {
+        ApplyStatusEffect = 0
+    }
+    public record AvailableOptions(Player Player, List<ActivePlayerActionEnum> Actions);
 
     // Werte in einen Record speichern um Angriffswerte anzeigen lassen, aus dem charakter löschen kein print in der logik funktion außer debugging
-    public record ActionHistoryEntry(PlayerActionEnum? Action, Entity Initiator, List<Entity> Target, Item? Item = null);
+    public record ActionHistoryEntry(ActivePlayerActionEnum? ActiveAction, PassiveActionEnum? PassiveAction, Entity? Initiator, List<Entity> Target, Item? Item = null, int? Duration = 0, double? Value = 0);
 }
