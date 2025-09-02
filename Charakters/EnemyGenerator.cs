@@ -24,5 +24,6 @@ public class EnemyGenerator
         enemy.MaxHealth = (enemy.GetMaxHealthValue() - 8) + (4 * fight.Level);
         enemy.CurrentHealth = enemy.MaxHealth;
         enemy.Class.AttackModifier = rnd.Next((int)(enemy.Class.AttackModifier + (fight.Level * 1.5) - 2), (int)(enemy.Class.AttackModifier + (fight.Level * 1.5) + 2));
+        enemy.Inventory = enemy.Class.Inventory;
     }
 }

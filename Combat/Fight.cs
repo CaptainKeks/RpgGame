@@ -9,8 +9,6 @@ namespace Game.Combat;
 
 public class Fight
 {
-    // Zustand über Fight über public getter
-    // Totzdem alle teilnehme player + enemies als property
     public int Turn { get; set; } = 1;
     public int Round { get; set; } = 1;
     public int Level { get; set; } = 1;
@@ -26,19 +24,26 @@ public class Fight
     {
 
     }
-
-    public Fight(Player player, List<Enemy> enemies) // Enemies vielleicht hier erzeugen -> EnemyGenerator reinreichen
+    /// <summary>
+    /// Befüllt Player, Enemies und Enteties
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="enemies"></param>
+    public Fight(Player player, List<Enemy> enemies)
     {
-        // Teilnehmer befüllen -> enemies hinzufügen
         Entities.Add(player);
         Player = player;
         Entities.AddRange(enemies);
         Enemies.AddRange(enemies);
     }
 
-    public Fight(Player player, EnemyGenerator enemies) // Enemies vielleicht hier erzeugen -> EnemyGenerator reinreichen
+    /// <summary>
+    /// Befüllt Player, erzeugt neue Enemies und befüllt Enteties
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="enemies"></param>
+    public Fight(Player player, EnemyGenerator enemies)
     {
-        // Teilnehmer befüllen -> mit übergebenen generator erzeugen
         Entities.Add(player);
         Player = player;
         Entities.AddRange(enemies.Enemies);
@@ -53,6 +58,11 @@ public class Fight
         return new AvailableOptions(Player, playerActionEnums);
     }
 
+    /// <summary>
+    /// Gibt eine Liste von Enteties zurück wer Ausgewählt werden kann je nach Aktion
+    /// </summary>
+    /// <param name="action"></param>
+    /// <returns></returns>
     public List<Entity> GetAvailableTargets(ActivePlayerActionEnum action)
     {
         if (action == ActivePlayerActionEnum.Attack)
@@ -71,10 +81,16 @@ public class Fight
             return Entities;
     }
 
+    /// <summary>
+    /// Gibt einen History Eintrag zurück und führt die Ausgewählte Aktion aus die der Spieler ausgewählt hat
+    /// </summary>
+    /// <param name="decision"></param>
+    /// <returns></returns>
     public ActionHistoryEntry PlayerMoveForRound(PlayerChoice decision)
     {
         if (decision == null)
             return null;
+
         ActionHistoryEntry historyEntry = null;
         TryIfHealthIsZero(Player, Enemies);
 
@@ -98,21 +114,12 @@ public class Fight
         }
         Turn++;
         return historyEntry;
-        // switch je nach Action
-        // 
-        // aktion ausführen trigger und target übergeben
-
-        // turns + round entsprechend anpassen
-
-        // EnemyMove();
-        // SelectTarget();
-        // nach aufruf ist der Zustand hier wieder anders 
-        // und kann dargestellt werden
-        // turns + round entsprechend anpassen
-
-        // ApplyStatusEffects();
     }
 
+    /// <summary>
+    /// Führt eine Aktion aus die durch Zufall generiert wird. Und zählt die Runde eins höher
+    /// </summary>
+    /// <returns></returns>
     public List<ActionHistoryEntry> EnemyMoveForRound()
     {
         List<ActionHistoryEntry> list = new List<ActionHistoryEntry>();
@@ -121,8 +128,13 @@ public class Fight
 
         foreach (var enemy in Enemies)
         {
+            var enemyMove = 0;
             var rnd = new Random();
-            var enemyMove = rnd.Next(1, 4);
+            if (enemy.Inventory.Where(i => i.Name == "GiftTrank").Count() > 0)
+                enemyMove = rnd.Next(4, 5);
+            else
+                enemyMove = rnd.Next(1, 4);
+
             switch (enemyMove)
             {
                 case 1:
@@ -141,7 +153,7 @@ public class Fight
                     continue;
 
                 case 4:
-                    historyEntry = enemy.Inventory[0].UseItem(enemy, enemy, out bool _);
+                    historyEntry = enemy.Inventory[0].UseItem(enemy, Player, out bool _);
                     list.Add(historyEntry);
                     continue;
             }
@@ -151,6 +163,10 @@ public class Fight
         return list;
     }
 
+    /// <summary>
+    /// Wirkt jeden Statuseffekt jeder Entetie
+    /// </summary>
+    /// <returns></returns>
     public List<ActionHistoryEntry> ApplyStatusEffects()
     {
         var list = new List<ActionHistoryEntry>();
@@ -168,6 +184,11 @@ public class Fight
         return list;
     }
 
+    /// <summary>
+    /// Überprüft ob die Enemies oder der spieler Keine Leben mehr haben. Falls sie keine mehr haben geht es in das nächste Level oder, der Winner oder Loosing Screen wird angezeigt.
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="enemies"></param>
     private void TryIfHealthIsZero(Player player, List<Enemy> enemies)
     {
         isLevelFinished = false;
@@ -211,6 +232,10 @@ public class Fight
         }
     }
 
+    /// <summary>
+    /// Befüllt die Enteties und Enemies mit neuen Gegnern.
+    /// </summary>
+    /// <param name="enemyGenerator"></param>
     public void CreateNewEnemies(EnemyGenerator enemyGenerator)
     {
         Entities = [Player];
@@ -218,13 +243,13 @@ public class Fight
         Entities.AddRange(enemyGenerator.Enemies);
     }
 
-    // Hier wird die Entscheidung gespeichert
-    // z.B Action -> angriff (PlayerActionEnum)
-    // verursacher + target (sind bei IEntity)
-    // Hinweis für später
-    // später vielleicht statt enum (Attack, SpecialAttack, Defend) ... -> IAction
-    // So kann man verschiedene Attacken, bzw. Items gleich mit übergeben
-    // so fällt auch arg Item weg
+    /// <summary>
+    /// Speichert die Action eines Spielers zum Darstellen in der UI.
+    /// </summary>
+    /// <param name="Action"></param>
+    /// <param name="Initiator"></param>
+    /// <param name="Target"></param>
+    /// <param name="Item"></param>
     public record PlayerChoice(ActivePlayerActionEnum Action, Entity Initiator, List<Entity> Target, Item? Item = null);
 
     public enum ActivePlayerActionEnum
@@ -235,12 +260,28 @@ public class Fight
         UseItem = 4,
         Flee = 5
     }
+
     public enum PassiveActionEnum
     {
         ApplyStatusEffect = 0
     }
+
+    /// <summary>
+    /// Speichert die Möglichen Aktionen für einen Spieler
+    /// </summary>
+    /// <param name="Player"></param>
+    /// <param name="Actions"></param>
     public record AvailableOptions(Player Player, List<ActivePlayerActionEnum> Actions);
 
-    // Werte in einen Record speichern um Angriffswerte anzeigen lassen, aus dem charakter löschen kein print in der logik funktion außer debugging
-    public record ActionHistoryEntry(ActivePlayerActionEnum? ActiveAction, PassiveActionEnum? PassiveAction, Entity? Initiator, List<Entity> Target, Item? Item = null, int? Duration = 0, double? Value = 0);
+    /// <summary>
+    /// Speichert Die Aktion mit Kampfwerten ab um in der UI Darzustellen.
+    /// </summary>
+    /// <param name="ActiveAction"></param>
+    /// <param name="PassiveAction"></param>
+    /// <param name="Initiator"></param>
+    /// <param name="Target"></param>
+    /// <param name="Item"></param>
+    /// <param name="Duration"></param>
+    /// <param name="Value"></param>
+    public record ActionHistoryEntry(ActivePlayerActionEnum? ActiveAction, PassiveActionEnum? PassiveAction, Entity? Initiator, List<Entity> Target, Item? Item = null, int Duration = 0, double Value = 0);
 }

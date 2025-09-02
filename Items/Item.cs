@@ -1,5 +1,6 @@
 ﻿using Game.Charakters;
 using Game.Combat;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Game.Items;
 
@@ -7,9 +8,9 @@ public abstract class Item
 {
     public abstract string Name { get; set; }
     public abstract string Description { get; }
-    public abstract int Count { get; set; }
+    public abstract int Count { get; set; } // TODO sollte weg -> ist in Inventar
     public abstract double Value { get; set; }
-    public abstract int Duration { get; set; }
+    public abstract int Duration { get; set; } // nur consumable mit statuseffekten etc. -> ebene runter
 
     public abstract Fight.ActionHistoryEntry UseItem(Entity player, Entity enemy, out bool noItemUsed);
 
@@ -19,4 +20,7 @@ public abstract class Item
         Count = count;
         Value = value;
     }
+
+
+    
 }

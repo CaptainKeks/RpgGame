@@ -28,10 +28,6 @@ class GiftTrank : Item
                 noItemUsed = false;
                 target.StatusEffekts.Add(new StatusEffekt("Gift", "Fügt jede Runde dem Gegner 5 Schaden zu kann gestäckt werden.", Duration, Value));
                 Count--;
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine($"Wirke GiftTrank auf {target.Name} für {Duration} Runden.");
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.ReadKey();
             }
             else
             {
@@ -39,16 +35,15 @@ class GiftTrank : Item
                 foreach (var effekt in query)
                     effekt.Value += Value;
                 noItemUsed = false;
+                Count--;
             }
+            return new Fight.ActionHistoryEntry(Fight.ActivePlayerActionEnum.UseItem, null, initiator, [target], this);
         }
         else
         {
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("Du kannst niemanden vergiften du hast keine Tränke mehr.");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.ReadKey();
+            initiator.Inventory.Remove(this);
             noItemUsed = true;
+            return new Fight.ActionHistoryEntry(Fight.ActivePlayerActionEnum.UseItem, null, initiator, [target], this, noItemUsed::noItemUsed);
         }
-        return new Fight.ActionHistoryEntry(Fight.ActivePlayerActionEnum.UseItem, null, initiator, [target], this);
     }
 }

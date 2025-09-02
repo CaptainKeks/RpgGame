@@ -122,7 +122,7 @@ class FightMenu : Menu
         Console.WriteLine();
         var historyEntrys = fight.EnemyMoveForRound();
         foreach (var entry in historyEntrys)
-            PrintHistoryEntry(entry);
+            PrintHistoryEntry(entry, fight);
     }
 
     private void PrintMenuPlayerMove(Fight fight)
@@ -143,10 +143,10 @@ class FightMenu : Menu
 
         if (choice.Action != ActivePlayerActionEnum.UseItem)
             historyEntry = fight.PlayerMoveForRound(choice);
-        PrintHistoryEntry(historyEntry);
+        PrintHistoryEntry(historyEntry, fight);
     }
 
-    private void PrintHistoryEntry(ActionHistoryEntry historyEntry)
+    private void PrintHistoryEntry(ActionHistoryEntry historyEntry, Fight fight)
     {
         if (historyEntry == null)
             return;
@@ -198,7 +198,9 @@ class FightMenu : Menu
                     break;
 
                 case ActivePlayerActionEnum.UseItem:
-                    Console.WriteLine($"Ich {historyEntry.Initiator.Name} nutze {historyEntry.Item.Name} mit dem Wert: {historyEntry.Item.Value}.");
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine($"Wirke {historyEntry.Item.Name} auf {historyEntry.Target[0].Name} für {historyEntry.Item.Duration} Runden.");
+                    Console.ForegroundColor = ConsoleColor.White;
                     Console.WriteLine();
                     Console.Write("Drücke [Enter] für den nächsten Zug.");
                     Console.ReadKey();
