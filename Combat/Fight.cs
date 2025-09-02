@@ -131,7 +131,7 @@ public class Fight
             var enemyMove = 0;
             var rnd = new Random();
             if (enemy.Inventory.Where(i => i.Name == "GiftTrank").Count() > 0)
-                enemyMove = rnd.Next(4, 5);
+                enemyMove = rnd.Next(1, 5);
             else
                 enemyMove = rnd.Next(1, 4);
 
