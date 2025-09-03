@@ -1,4 +1,5 @@
 ﻿using Game.Items;
+using Newtonsoft.Json;
 
 namespace Game.Charakters;
 
@@ -19,11 +20,23 @@ public class Player : Entity
         Inventory.AddItems([new GiftTrank("GiftTrank", 5), new HeilTrank("HeilTrank", 30)]);
     }
 
+    public Player()
+    {
+        Inventory = new Inventory();
+    }
+
+    [JsonProperty]
     public override string Name { get; protected set; } = "Aria";
+    [JsonProperty]
     public override double BaseAttack { get; protected set; } = 4;
+    [JsonProperty]
     public override double BaseDefence { get; protected set; } = 3;
+    [JsonProperty]
     public override double BaseWisdom { get; protected set; } = 0;
-    public override double MaxHealth { get; set; } = 30;
+    [JsonProperty]
+    public override double MaxHealth { get; protected set; } = 30;
+    [JsonProperty]
+    public override double BaseHealth { get; protected set; } = 30;
 
     /// <summary>
     /// Attackiert den mitgegeben Charakter und zieht die Defence von der Attacke ab.

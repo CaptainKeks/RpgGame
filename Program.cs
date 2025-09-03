@@ -10,7 +10,7 @@ class Programm
     {
         var player = SaveAndLoadJson.LoadGame(out _);
         if (player == null)
-            player = new Player(new Mage());
+            player = new Player();
         Menu startMenu = new StartMenu(player);
         HandleInput(player);
     }

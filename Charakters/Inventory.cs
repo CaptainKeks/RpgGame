@@ -6,18 +6,21 @@ namespace Game.Charakters;
 
 public class Inventory
 {
+    public List<ItemStack> Items { get; private set; } = [];
+    public int Gold { get; private set; } = 0; // TODO vielleicht später mal ulong falls 2 millarden nicht reichen xD
+
     public Inventory() { }
 
-    public List<ItemStack> Items { get; set; } = [];
-    public record ViewItem(string Name, string Description, int Count, double Value, int? Duration = 0);
 
-    public record ItemStack(Item Item, int Count)
+    public void AddLoot(Enemy enemy)
     {
-        public ViewItem GetViewItem()
-        {
-            return new ViewItem(Item.Name, Item.Description, Count, Item.Value);
-        }
-    };
+
+    }
+
+    public void AddGold(int amount)
+    {
+        Gold += amount;
+    }
 
     public void AddItem(Item item, int count = 1)
     {
@@ -90,4 +93,16 @@ public class Inventory
 
     // zu jedem Item Typ anders 
     // z.B Duration gibt es nicht überall
+
+
+    // Inventory Models
+    public record ViewItem(string Name, string Description, int Count, double Value, int? Duration = 0);
+
+    public record ItemStack(Item Item, int Count)
+    {
+        public ViewItem GetViewItem()
+        {
+            return new ViewItem(Item.Name, Item.Description, Count, Item.Value);
+        }
+    };
 }

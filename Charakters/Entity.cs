@@ -14,12 +14,12 @@ public abstract class Entity
     public virtual double BaseHealth { get; protected set; }
     public virtual double CurrentHealth { get; set; }
     public virtual double ActualDamage { get; set; }
-    public virtual double MaxHealth { get; set; }
+    public virtual double MaxHealth { get; protected set; }
     public virtual bool InDefensePosition { get; set; } = false;
     public virtual Class Class { get; set; }
     public virtual Inventory Inventory { get; set; } = new();
     public virtual List<StatusEffekt> StatusEffekts { get; set; } = [];
-    public virtual MetaProgression MetaProgression { get; set; } = new(0, 0, 0, 0, 0, 0, 0, 20, 0, 0);
+    public virtual ShopBonusStats MetaProgression { get; set; } = new(0, 0, 0, 0, 0, 0, 0, 20, 0, 0);
 
 
     // Eine Klasse erstellen für GameSaves wo alle gespeicherten werte drin sind 
@@ -33,6 +33,8 @@ public abstract class Entity
         MaxHealth = GetMaxHealthValue();
         CurrentHealth = MaxHealth;
     }
+
+    public Entity() { }
 
     public virtual Fight.ActionHistoryEntry Attack(Entity defender)
     {
@@ -64,27 +66,27 @@ public abstract class Entity
 
     public virtual double GetAttackValue()
     {
-        return (BaseAttack + MetaProgression.Attack + Class.AttackModifier + CurrentHealth * 0.1) * GetWisdomValue();
+        return (BaseAttack + MetaProgression.ShopAttackUpgrade + Class.AttackModifier + CurrentHealth * 0.1) * GetWisdomValue();
     }
 
     public virtual double GetSpecialAttackValue()
     {
-        return (BaseAttack + MetaProgression.Attack + Class.SpecialAttackModifier + CurrentHealth * 0.1) * GetWisdomValue();
+        return (BaseAttack + MetaProgression.ShopAttackUpgrade + Class.SpecialAttackModifier + CurrentHealth * 0.1) * GetWisdomValue();
     }
 
     public virtual double GetDefenseValue()
     {
-        return (BaseDefence + MetaProgression.Defense + Class.DefenceModifier) * GetWisdomValue();
+        return (BaseDefence + MetaProgression.ShpoDefenseUpgrade + Class.DefenceModifier) * GetWisdomValue();
     }
 
     public virtual double GetMaxHealthValue()
     {
-        return (BaseHealth + MetaProgression.Health + Class.HealthModifier) * GetWisdomValue();
+        return (BaseHealth + MetaProgression.BonusShopHealthStat + Class.HealthModifier) * GetWisdomValue();
     }
 
     public virtual double GetWisdomValue()
     {
-        return (BaseWisdom + MetaProgression.Wisdom + Class.WisdomModifier);
+        return (BaseWisdom + MetaProgression.BBonusShopWisdomStat + Class.WisdomModifier);
     }
 
     public virtual void UpgradeBaseValue(BaseValue baseValue)
@@ -101,19 +103,19 @@ public abstract class Entity
         switch (baseValue)
         {
             case BaseValue.Attack:
-                UpgradeBaseValues(MetaProgression, m => m.Attack, (m, v) => m.Attack = v, "Attack", 1);
+                UpgradeBaseValues(MetaProgression, m => m.ShopAttackUpgrade, (m, v) => m.ShopAttackUpgrade = v, "Attack", 1);
                 Console.ReadKey();
                 break;
             case BaseValue.Defense:
-                UpgradeBaseValues(MetaProgression, m => m.Defense, (m, v) => m.Defense = v, "Defense", 1);
+                UpgradeBaseValues(MetaProgression, m => m.ShpoDefenseUpgrade, (m, v) => m.ShpoDefenseUpgrade = v, "Defense", 1);
                 Console.ReadKey();
                 break;
             case BaseValue.Wisdom:
-                UpgradeBaseValues(MetaProgression, m => m.Wisdom, (m, v) => m.Wisdom = v, "Wisdom", 1);
+                UpgradeBaseValues(MetaProgression, m => m.BBonusShopWisdomStat, (m, v) => m.BBonusShopWisdomStat = v, "Wisdom", 1);
                 Console.ReadKey();
                 break;
             case BaseValue.Health:
-                UpgradeBaseValues(MetaProgression, m => m.Health, (m, v) => m.Health = v, "Health", 5);
+                UpgradeBaseValues(MetaProgression, m => m.BonusShopHealthStat, (m, v) => m.BonusShopHealthStat = v, "Health", 5);
                 break;
             case BaseValue.HealthPotion:
                 UpgradeBaseValues(MetaProgression, m => m.HealthPotion, (m, v) => m.HealthPotion = v, "HealthPotion", 5);
@@ -126,7 +128,7 @@ public abstract class Entity
         }
     }
 
-    private void UpgradeBaseValues(MetaProgression meta, Func<MetaProgression, double> getter, Action<MetaProgression, double> setter, string label, int increment)
+    private void UpgradeBaseValues(ShopBonusStats meta, Func<ShopBonusStats, double> getter, Action<ShopBonusStats, double> setter, string label, int increment)
     {
         var current = getter(meta);
         setter(meta, current + increment);

@@ -20,10 +20,10 @@ class UpgradeMenu : Menu
         Console.WriteLine();
         Console.WriteLine($"Preis: {player.MetaProgression.Price} Gold!");
         Console.WriteLine();
-        Console.WriteLine($"[1] Attack       + 1   (Aktueller Wert: {player.MetaProgression.Attack})");
-        Console.WriteLine($"[2] Defense      + 1   (Aktueller Wert: {player.MetaProgression.Defense})");
-        Console.WriteLine($"[3] Wisdom       + 0.1 (Aktueller Wert: {player.MetaProgression.Wisdom})");
-        Console.WriteLine($"[4] Health       + 5   (Aktueller Wert: {player.MetaProgression.Health})");
+        Console.WriteLine($"[1] Attack       + 1   (Aktueller Wert: {player.MetaProgression.ShopAttackUpgrade})");
+        Console.WriteLine($"[2] Defense      + 1   (Aktueller Wert: {player.MetaProgression.ShpoDefenseUpgrade})");
+        Console.WriteLine($"[3] Wisdom       + 0.1 (Aktueller Wert: {player.MetaProgression.BBonusShopWisdomStat})");
+        Console.WriteLine($"[4] Health       + 5   (Aktueller Wert: {player.MetaProgression.BonusShopHealthStat})");
         Console.WriteLine($"[5] HealthPotion + 5   (Aktueller Wert: {player.MetaProgression.HealthPotion})");
         Console.WriteLine($"[6] PoisenPotion + 1   (Aktueller Wert: {player.MetaProgression.PoisonPotion})");
         Console.WriteLine("[7] Zurück");
