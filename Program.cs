@@ -1,6 +1,7 @@
 ﻿using Game.Charakters;
 using Game.Combat;
 using Game.Helper;
+using Game.Items;
 using Game.Menus;
 
 class Programm
@@ -8,16 +9,15 @@ class Programm
     public static void Main()
     {
         var player = SaveAndLoadJson.LoadGame(out _);
+        if (player == null)
+            player = new Player(new Mage());
         Menu startMenu = new StartMenu(player);
         HandleInput(player);
     }
 
-    public static void HandleInput(Entity player)
+    public static void HandleInput(Player? player = null)
     {
-        Player newPlayer = new Player();
-        Fight fight = new Fight(new Player(), [new Enemy()]);
-        newPlayer.MetaProgression = player.MetaProgression;
-        newPlayer.CurrentHealth = newPlayer.MaxHealth;
+        Fight fight = new Fight();
         List<Entity> enemies;
         string input;
         while (true)
@@ -30,7 +30,7 @@ class Programm
                 case "1":
                     // Neues Spiel erstellen
                     validInput = true;
-                    Menu nextMenu = new CharakterMenu(newPlayer);
+                    Menu nextMenu = new CharakterMenu();
                     break;
                 case "2":
                     // Spiel Laden
@@ -41,14 +41,23 @@ class Programm
                         break;
                     }
                     fight = SaveAndLoadJson.LoadFight();
-                    player.IsLoadedFromFile = true;
                     nextMenu = new FightMenu(player, fight);
                     validInput = true;
                     break;
                 case "3":
                     // Upgrade durchführen
-                    nextMenu = new UpgradeMenu(player);
-                    validInput = true;
+                    if (player != null)
+                    {
+                        nextMenu = new UpgradeMenu(player);
+                        validInput = true;
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Es ist kein Spieler geladen erstelle bitte zuerst ein neues Spiel.");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        validInput = false;
+                    }
                     break;
                 case "4":
                     SaveAndLoadJson.SaveGame(player);

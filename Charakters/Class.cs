@@ -10,7 +10,7 @@ public abstract class Class
     public abstract double AttackModifier { get; set; }
     public abstract double DefenceModifier { get; set; }
     public abstract double SpecialAttackModifier { get; set; }
-    public abstract List<Item> Inventory { get; set; }
+    public abstract Inventory BaseInventory { get; set; } // BaseInventory
     public Class()
     {
 

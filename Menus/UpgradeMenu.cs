@@ -11,7 +11,7 @@ class UpgradeMenu : Menu
         Console.ForegroundColor = ConsoleColor.White;
         Console.WriteLine("-------------");
     }
-    public UpgradeMenu(Entity player)
+    public UpgradeMenu(Player player)
     {
         Console.ForegroundColor = ConsoleColor.DarkYellow;
         Console.WriteLine($"Gold: {player.MetaProgression.Gold}");
@@ -30,7 +30,7 @@ class UpgradeMenu : Menu
         HandleInput(player);
     }
 
-    private void HandleInput(Entity player)
+    private void HandleInput(Player player)
     {
         string input;
         bool validInput = false;

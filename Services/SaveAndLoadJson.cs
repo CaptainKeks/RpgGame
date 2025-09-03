@@ -37,7 +37,7 @@ static class SaveAndLoadJson
                 TypeNameHandling = TypeNameHandling.All,
                 Formatting = Formatting.Indented
             };
-            var fight = new Fight(new Player(), [new Enemy()]);
+            var fight = new Fight();
             string text = File.ReadAllText(AppContext.BaseDirectory + "saveFight.json");
             fight = JsonConvert.DeserializeObject<Fight>(text, settings);
             return fight;
@@ -46,7 +46,7 @@ static class SaveAndLoadJson
         {
             Console.WriteLine(ex.Message);
             Console.ReadKey();
-            return new Fight(new Player(), [new Enemy()]);
+            return new Fight();
         }
     }
 
@@ -59,9 +59,8 @@ static class SaveAndLoadJson
                 TypeNameHandling = TypeNameHandling.All,
                 Formatting = Formatting.Indented
             };
-            var player = new Player();
             string text = File.ReadAllText(AppContext.BaseDirectory + "savegame.json");
-            player = JsonConvert.DeserializeObject<Player>(text, settings);
+           Player player = JsonConvert.DeserializeObject<Player>(text, settings);
             succeded = true;
             return player;
         }
@@ -74,7 +73,7 @@ static class SaveAndLoadJson
             Console.ForegroundColor = ConsoleColor.White;
             succeded = false;
             Console.ReadKey();
-            return new Player();
+            return null;
         }
     }
 }

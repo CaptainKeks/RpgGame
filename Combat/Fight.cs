@@ -12,7 +12,7 @@ public class Fight
     public int Turn { get; set; } = 1;
     public int Round { get; set; } = 1;
     public int Level { get; set; } = 1;
-    public int EnemyCount { get; set; }
+    public int EnemyCount { get; set; } = 0;
     public int MaxLevel { get; set; } = 3;
     public List<Entity> Entities { get; set; } = [];
     public List<Enemy> Enemies { get; set; } = [];
@@ -20,10 +20,9 @@ public class Fight
     public bool isGameFinished { get; set; } = false;
     public bool isLevelFinished { get; set; }
 
-    public Fight()
-    {
 
-    }
+    public Fight() { }
+
     /// <summary>
     /// Befüllt Player, Enemies und Enteties
     /// </summary>
@@ -130,10 +129,6 @@ public class Fight
         {
             var enemyMove = 0;
             var rnd = new Random();
-            if (enemy.Inventory.Where(i => i.Name == "GiftTrank").Count() > 0)
-                enemyMove = rnd.Next(1, 5);
-            else
-                enemyMove = rnd.Next(1, 4);
 
             switch (enemyMove)
             {
@@ -153,7 +148,7 @@ public class Fight
                     continue;
 
                 case 4:
-                    historyEntry = enemy.Inventory[0].UseItem(enemy, Player, out bool _);
+                    historyEntry = enemy.Inventory.UseItem(null, enemy, Player);
                     list.Add(historyEntry);
                     continue;
             }
@@ -283,5 +278,5 @@ public class Fight
     /// <param name="Item"></param>
     /// <param name="Duration"></param>
     /// <param name="Value"></param>
-    public record ActionHistoryEntry(ActivePlayerActionEnum? ActiveAction, PassiveActionEnum? PassiveAction, Entity? Initiator, List<Entity> Target, Item? Item = null, int Duration = 0, double Value = 0);
+    public record ActionHistoryEntry(ActivePlayerActionEnum? ActiveAction, PassiveActionEnum? PassiveAction, Entity? Initiator, List<Entity> Target, Item? Item = null, int Duration = 0, double Value = 0, bool noItemUsed = false);
 }

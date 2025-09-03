@@ -8,19 +8,14 @@ public abstract class Item
 {
     public abstract string Name { get; set; }
     public abstract string Description { get; }
-    public abstract int Count { get; set; } // TODO sollte weg -> ist in Inventar
     public abstract double Value { get; set; }
-    public abstract int Duration { get; set; } // nur consumable mit statuseffekten etc. -> ebene runter
+    public abstract int Duration { get; set; }
 
     public abstract Fight.ActionHistoryEntry UseItem(Entity player, Entity enemy, out bool noItemUsed);
 
-    public Item(string name, int count, double value)
+    public Item(string name, double value)
     {
         Name = name;
-        Count = count;
         Value = value;
     }
-
-
-    
 }

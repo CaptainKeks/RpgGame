@@ -21,17 +21,17 @@ class CharakterMenu : Menu
         Console.ForegroundColor = ConsoleColor.White;
     }
 
-    public CharakterMenu(Player player)
+    public CharakterMenu()
     {
-        HandleInput(player);
+        HandleInput();
     }
 
-    private void HandleInput(Player player)
+    private void HandleInput()
     {
         Menu nextMenu;
         string input;
         bool validInput = false;
-        var fight = new Fight(new Player(), []);
+        var fight = new Fight();
         Random rnd = new Random();
 
         while (true)
@@ -39,20 +39,16 @@ class CharakterMenu : Menu
             Console.Write("> ");
             input = Console.ReadLine();
 
-
             switch (input)
             {
                 case "1":
-                    if (!player.IsLoadedFromFile)
-                        InitializePlayer(player, new Warrior());
+                    var player = new Player(new Warrior());
                     fight = new Fight(player, new EnemyGenerator(new Ork(), rnd.Next(1, 2), fight));
                     nextMenu = new FightMenu(player, fight);
                     validInput = true;
                     break;
                 case "2":
-                    if (!player.IsLoadedFromFile)
-                        InitializePlayer(player, new Mage());
-
+                    player = new Player(new Mage());
                     fight = new Fight(player, new EnemyGenerator((new Ork()), rnd.Next(1, 2), fight));
                     nextMenu = new FightMenu(player, fight);
                     validInput = true;
@@ -70,14 +66,5 @@ class CharakterMenu : Menu
             if (validInput)
                 break;
         }
-    }
-
-    private void InitializePlayer(Entity player, Class @class)
-    {
-        player.Name = "Aria";
-        player.Class = @class;
-        player.Inventory = @class.Inventory;
-        player.MaxHealth = player.GetMaxHealthValue();
-        player.CurrentHealth = player.MaxHealth;
     }
 }

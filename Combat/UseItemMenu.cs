@@ -16,15 +16,16 @@ class UseItemMenu : Menu
 
     public UseItemMenu(Entity player, out bool noItemUsed, out PlayerChoice historyEntry)
     {
-        for (int i = 0; i < player.Inventory.Count; i++)
-            Console.WriteLine($"[{i}] {player.Inventory[i].Name} ({player.Inventory[i].Count}x) <{player.Inventory[i].Description}> ");
-        Console.WriteLine($"[{player.Inventory.Count}] zurück zum Kampf");
+       var content = player.Inventory.GetInventoryContents();
+        for (int i = 0; i < content.Length; i++)
+            Console.WriteLine($"[{i}] {content[i].Name} ({content[i].Count}) <{content[i].Description}>");
+        Console.WriteLine($"[{content.Length}] zurück zum Kampf");
         historyEntry = HandleInput(player, out noItemUsed);
     }
 
     private PlayerChoice HandleInput(Entity player, out bool noItemUsed)
     {
-        PlayerChoice historyEntry = null;
+        PlayerChoice choice = null;
         noItemUsed = false;
         string input = "";
         bool validInput = false;
@@ -38,20 +39,20 @@ class UseItemMenu : Menu
             switch (input)
             {
                 case "0":
-                    historyEntry = new PlayerChoice(ActivePlayerActionEnum.UseItem, player, [], player.Inventory[id]);
+                    choice = new PlayerChoice(ActivePlayerActionEnum.UseItem, player, [], player.Inventory.Items[id].Item);
                     validInput = true;
                     break;
                 case "1":
-                    historyEntry = new PlayerChoice(ActivePlayerActionEnum.UseItem, player, [], player.Inventory[id]);
+                    choice = new PlayerChoice(ActivePlayerActionEnum.UseItem, player, [], player.Inventory.Items[id].Item);
                     validInput = true;
                     break;
                 case "2":
-                    historyEntry = null;
+                    choice = null;
                     noItemUsed = true;
                     validInput = true;
                     break;
                 default:
-                    historyEntry = null;
+                    choice = null;
                     validInput = false;
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Falscher Input");
@@ -59,6 +60,6 @@ class UseItemMenu : Menu
                     break;
             }
         }
-        return historyEntry;
+        return choice;
     }
 }

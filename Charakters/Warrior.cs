@@ -12,5 +12,5 @@ class Warrior : Class
     public override double AttackModifier { get; set; } = 3;
     public override double DefenceModifier { get; set; } = 6;
     public override double SpecialAttackModifier { get; set; } = 10;
-    public override List<Item> Inventory { get; set; } = [];
+    public override Inventory BaseInventory { get; set; } = new Inventory();
 }

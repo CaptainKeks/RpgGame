@@ -1,24 +1,39 @@
 ﻿
 using Game.Combat;
 using Game.Items;
+using System.Numerics;
 
 namespace Game.Charakters;
 
 public abstract class Entity
 {
-    public virtual string Name { get; set; }
-    public virtual double BaseAttack { get; set; }
-    public virtual double BaseDefence { get; set; }
-    public virtual double BaseWisdom { get; set; }
+    public virtual string Name { get; protected set; }
+    public virtual double BaseAttack { get; protected set; }
+    public virtual double BaseDefence { get; protected set; }
+    public virtual double BaseWisdom { get; protected set; }
+    public virtual double BaseHealth { get; protected set; }
     public virtual double CurrentHealth { get; set; }
     public virtual double ActualDamage { get; set; }
-    public virtual bool IsLoadedFromFile { get; set; }
     public virtual double MaxHealth { get; set; }
-    public virtual bool InDefensePosition { get; set; }
+    public virtual bool InDefensePosition { get; set; } = false;
     public virtual Class Class { get; set; }
-    public virtual List<Item> Inventory { get; set; }
-    public virtual List<StatusEffekt> StatusEffekts { get; set; }
-    public virtual MetaProgression MetaProgression { get; set; }
+    public virtual Inventory Inventory { get; set; } = new();
+    public virtual List<StatusEffekt> StatusEffekts { get; set; } = [];
+    public virtual MetaProgression MetaProgression { get; set; } = new(0, 0, 0, 0, 0, 0, 0, 20, 0, 0);
+
+
+    // Eine Klasse erstellen für GameSaves wo alle gespeicherten werte drin sind 
+    // die klasse hat methoden die die werte in Player enemie usw in den konstruktor übergeben und diese dann setzen
+    // geänderte werte die sich nicht berechenn lassen muss ich synchronisieren
+
+    public Entity(Class @class)
+    {
+        Class = @class;
+        Inventory = @class.BaseInventory;
+        MaxHealth = GetMaxHealthValue();
+        CurrentHealth = MaxHealth;
+    }
+
     public virtual Fight.ActionHistoryEntry Attack(Entity defender)
     {
         ActualDamage = GetAttackValue() - defender.GetDefenseValue();
@@ -29,6 +44,7 @@ public abstract class Entity
         defender.InDefensePosition = false;
         return new Fight.ActionHistoryEntry(Fight.ActivePlayerActionEnum.Attack, null, this, [defender]);
     }
+
     public virtual Fight.ActionHistoryEntry SpecialAttack(Entity defender)
     {
         ActualDamage = (GetSpecialAttackValue() - defender.GetDefenseValue());
@@ -39,31 +55,38 @@ public abstract class Entity
         defender.InDefensePosition = false;
         return new Fight.ActionHistoryEntry(Fight.ActivePlayerActionEnum.SpecialAttack, null, this, [defender]);
     }
+
     public virtual Fight.ActionHistoryEntry GetInDefensePosition()
     {
         InDefensePosition = true;
         return new Fight.ActionHistoryEntry(Fight.ActivePlayerActionEnum.Defend, null, this, []);
     }
+
     public virtual double GetAttackValue()
     {
         return (BaseAttack + MetaProgression.Attack + Class.AttackModifier + CurrentHealth * 0.1) * GetWisdomValue();
     }
+
     public virtual double GetSpecialAttackValue()
     {
         return (BaseAttack + MetaProgression.Attack + Class.SpecialAttackModifier + CurrentHealth * 0.1) * GetWisdomValue();
     }
+
     public virtual double GetDefenseValue()
     {
         return (BaseDefence + MetaProgression.Defense + Class.DefenceModifier) * GetWisdomValue();
     }
+
     public virtual double GetMaxHealthValue()
     {
-        return (MaxHealth + MetaProgression.Health + Class.HealthModifier) * GetWisdomValue();
+        return (BaseHealth + MetaProgression.Health + Class.HealthModifier) * GetWisdomValue();
     }
+
     public virtual double GetWisdomValue()
     {
         return (BaseWisdom + MetaProgression.Wisdom + Class.WisdomModifier);
     }
+
     public virtual void UpgradeBaseValue(BaseValue baseValue)
     {
         if (MetaProgression.Gold < MetaProgression.Price)
@@ -102,6 +125,7 @@ public abstract class Entity
                 break;
         }
     }
+
     private void UpgradeBaseValues(MetaProgression meta, Func<MetaProgression, double> getter, Action<MetaProgression, double> setter, string label, int increment)
     {
         var current = getter(meta);
@@ -112,6 +136,7 @@ public abstract class Entity
         Console.WriteLine($"Deine {label} wurde auf {getter(meta)} erhöht.");
         Console.ForegroundColor = ConsoleColor.White;
     }
+
     public virtual string GetShortInfo()
     {
         return $"{Name} {Class.ClassName} HP: {CurrentHealth:F2}/{MaxHealth:F2}";

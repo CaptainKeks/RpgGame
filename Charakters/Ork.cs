@@ -11,5 +11,5 @@ class Ork : Class
     public override double AttackModifier { get; set; } = 6;
     public override double DefenceModifier { get; set; } = 4;
     public override double SpecialAttackModifier { get; set; } = 10;
-    public override List<Item> Inventory { get; set; } = [new  GiftTrank("GiftTrank", 1, 5, 2)];
+    public override Inventory BaseInventory { get; set; } = new Inventory();
 }
