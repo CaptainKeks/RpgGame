@@ -4,6 +4,7 @@ using Game.Helper;
 using Game.Items;
 using Game.Menus;
 using Game.Menus.FinishMenus;
+using Game.Utilities;
 
 namespace Game.Combat;
 
@@ -16,9 +17,9 @@ public class Fight
     public int MaxLevel { get; set; } = 3;
     public List<Entity> Entities { get; set; } = [];
     public List<Enemy> Enemies { get; set; } = [];
-    public Player Player { get; set; }
+    public Player Player { get; set; } = new();
     public bool isGameFinished { get; set; } = false;
-    public bool isLevelFinished { get; set; }
+    public bool isLevelFinished { get; set; } = false;
 
 
     public Fight() { }
@@ -108,7 +109,7 @@ public class Fight
                 break;
 
             case ActivePlayerActionEnum.UseItem:
-                historyEntry = decision.Item.UseItem(Player, Enemies[0], out _);
+                historyEntry = Player.Inventory.UseItem(decision.ViewItem, Player, decision.Target.Last());
                 break;
         }
         Turn++;
@@ -129,6 +130,9 @@ public class Fight
         {
             var enemyMove = 0;
             var rnd = new Random();
+            if (enemy.Inventory.Items.Count > 0)
+                enemyMove = rnd.Next(1, 5);
+            enemyMove = rnd.Next(1, 4);
 
             switch (enemyMove)
             {
@@ -190,7 +194,7 @@ public class Fight
         foreach (var enemy in enemies)
             if (enemy.CurrentHealth <= 0)
             {
-                player.MetaProgression.Gold += 12;
+                player.Inventory.AddGold(12);
                 enemies.Remove(enemy);
                 Entities.Remove(enemy);
                 break;
@@ -202,8 +206,8 @@ public class Fight
 
         if (playerWins)
         {
-            player.MetaProgression.Wins += 1;
-            SaveAndLoadJson.SaveGame(player);
+            player.Stats.Wins += 1;
+            SaveAndLoadJson.SaveGame(new GameSaves(player, new Fight(), Shop.Instance));
             Menu nextMenu = new WinnerMenu();
             isGameFinished = true;
             isLevelFinished = true;
@@ -219,8 +223,8 @@ public class Fight
 
         if (playerLooses)
         {
-            player.MetaProgression.Losses += 1;
-            SaveAndLoadJson.SaveGame(player);
+            player.Stats.Losses += 1;
+            SaveAndLoadJson.SaveGame(new GameSaves(player, new Fight(), Shop.Instance));
             Menu nextMenu = new LoosingMenu();
             isGameFinished = true;
             isLevelFinished = true;
@@ -237,46 +241,47 @@ public class Fight
         Enemies = enemyGenerator.Enemies;
         Entities.AddRange(enemyGenerator.Enemies);
     }
-
-    /// <summary>
-    /// Speichert die Action eines Spielers zum Darstellen in der UI.
-    /// </summary>
-    /// <param name="Action"></param>
-    /// <param name="Initiator"></param>
-    /// <param name="Target"></param>
-    /// <param name="Item"></param>
-    public record PlayerChoice(ActivePlayerActionEnum Action, Entity Initiator, List<Entity> Target, Item? Item = null);
-
-    public enum ActivePlayerActionEnum
-    {
-        Attack = 1,
-        SpecialAttack = 2,
-        Defend = 3,
-        UseItem = 4,
-        Flee = 5
-    }
-
-    public enum PassiveActionEnum
-    {
-        ApplyStatusEffect = 0
-    }
-
-    /// <summary>
-    /// Speichert die Möglichen Aktionen für einen Spieler
-    /// </summary>
-    /// <param name="Player"></param>
-    /// <param name="Actions"></param>
-    public record AvailableOptions(Player Player, List<ActivePlayerActionEnum> Actions);
-
-    /// <summary>
-    /// Speichert Die Aktion mit Kampfwerten ab um in der UI Darzustellen.
-    /// </summary>
-    /// <param name="ActiveAction"></param>
-    /// <param name="PassiveAction"></param>
-    /// <param name="Initiator"></param>
-    /// <param name="Target"></param>
-    /// <param name="Item"></param>
-    /// <param name="Duration"></param>
-    /// <param name="Value"></param>
-    public record ActionHistoryEntry(ActivePlayerActionEnum? ActiveAction, PassiveActionEnum? PassiveAction, Entity? Initiator, List<Entity> Target, Item? Item = null, int Duration = 0, double Value = 0, bool noItemUsed = false);
 }
+
+/// <summary>
+/// Speichert die Action eines Spielers zum Darstellen in der UI.
+/// </summary>
+/// <param name="Action"></param>
+/// <param name="Initiator"></param>
+/// <param name="Target"></param>
+/// <param name="ViewItem"></param>
+public record PlayerChoice(ActivePlayerActionEnum Action, Entity Initiator, List<Entity> Target, Inventory.ViewItem? ViewItem = null);
+
+public enum ActivePlayerActionEnum
+{
+    Attack = 1,
+    SpecialAttack = 2,
+    Defend = 3,
+    UseItem = 4,
+    Flee = 5
+}
+
+public enum PassiveActionEnum
+{
+    ApplyStatusEffect = 0
+}
+
+/// <summary>
+/// Speichert die Möglichen Aktionen für einen Spieler
+/// </summary>
+/// <param name="Player"></param>
+/// <param name="Actions"></param>
+public record AvailableOptions(Player Player, List<ActivePlayerActionEnum> Actions);
+
+/// <summary>
+/// Speichert Die Aktion mit Kampfwerten ab um in der UI Darzustellen.
+/// </summary>
+/// <param name="ActiveAction"></param>
+/// <param name="PassiveAction"></param>
+/// <param name="Initiator"></param>
+/// <param name="Target"></param>
+/// <param name="Item"></param>
+/// <param name="StatusEffektDuration"></param>
+/// <param name="StatusEffektValue"></param>
+public record ActionHistoryEntry(ActivePlayerActionEnum? ActiveAction, Entity? Initiator, List<Entity> Target, Inventory.ViewItem? Item = null, int StatusEffektDuration = 0, double StatusEffektValue = 0, bool noItemUsed = false, double healed = 0);
+

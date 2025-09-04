@@ -17,12 +17,12 @@ public class Player : Entity
 {
     public Player(Class @class) : base(@class)
     {
-        Inventory.AddItems([new GiftTrank("GiftTrank", 5), new HeilTrank("HeilTrank", 30)]);
+        Inventory.AddItems([new HeilTrank("HeilTrank", 30), new GiftTrank("GiftTrank", 5, 3)]);
     }
-
     public Player()
     {
         Inventory = new Inventory();
+        Inventory.AddGold(500);
     }
 
     [JsonProperty]
@@ -37,9 +37,4 @@ public class Player : Entity
     public override double MaxHealth { get; protected set; } = 30;
     [JsonProperty]
     public override double BaseHealth { get; protected set; } = 30;
-
-    /// <summary>
-    /// Attackiert den mitgegeben Charakter und zieht die Defence von der Attacke ab.
-    /// </summary>
-    /// <param name="defender"></param>   
 }

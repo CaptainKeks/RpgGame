@@ -1,6 +1,7 @@
 ﻿
 using Game.Combat;
 using Game.Items;
+using Game.Utilities;
 
 namespace Game.Charakters;
 
@@ -14,13 +15,44 @@ public class Inventory
 
     public void AddLoot(Enemy enemy)
     {
-
+        throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// Addiert Gold zum Inventar Hinzu.
+    /// </summary>
+    /// <param name="amount"></param>
     public void AddGold(int amount)
     {
         Gold += amount;
     }
+
+    /// <summary>
+    /// Entfernt Gold falls Genug Gold vorhanden ist.
+    /// </summary>
+    /// <param name="amount"></param>
+    /// <param name="failed"></param>
+    public void RemoveGold(int amount, out bool failed)
+    {
+        failed = false;
+        if (Gold < amount)
+        {
+            failed = true;
+            return;
+        }
+        Gold -= amount;
+    }
+
+    /// <summary>
+    /// Erhöht den Preis der jeweiligen BaseValue.
+    /// </summary>
+    /// <param name="baseValue"></param>
+    /// <param name="amount"></param>
+    public void HigherPrice(BaseValue baseValue, int amount)
+    {
+        Shop.Instance.Prices[baseValue] += amount;
+    }
+
 
     public void AddItem(Item item, int count = 1)
     {
@@ -29,7 +61,8 @@ public class Inventory
         if (stack is not null)
         {
             var idx = Items.IndexOf(stack);
-            Items[idx] = stack with { Count = stack.Count + count };
+            stack.SetCount(stack.Count + count);
+            Items[idx] = stack;
         }
         else
         {
@@ -60,21 +93,25 @@ public class Inventory
         return Items.Select(item => item.GetViewItem()).ToArray();
     }
 
-    public Fight.ActionHistoryEntry UseItem(ViewItem viewItem, Entity player, Entity enemy)
+    public ActionHistoryEntry UseItem(ViewItem viewItem, Entity initiator, Entity target)
     {
         bool noItemUsed = false;
-        Fight.ActionHistoryEntry? historyEntry = null;
-        foreach (var item in Items)
+        ActionHistoryEntry? historyEntry = null;
+        foreach (var itemStack in Items)
         {
-            if (item.Item.Name == viewItem.Name && item.Count > 0)
+            if (itemStack.Item.Name == viewItem.Name && itemStack.Count > 0)
             {
+                itemStack.Item.UseItem(initiator, target, out noItemUsed);
+                itemStack.SubtractCount(1);
+                if (itemStack.Count < 1)
+                    initiator.Inventory.Items.Remove(itemStack);
                 noItemUsed = false;
-                historyEntry = item.Item.UseItem(player, enemy, out noItemUsed);
+                return new ActionHistoryEntry(ActivePlayerActionEnum.UseItem, initiator, [target], viewItem, noItemUsed: noItemUsed);
             }
             else
             {
                 noItemUsed = true;
-                return new Fight.ActionHistoryEntry(Fight.ActivePlayerActionEnum.UseItem, null, player, [enemy], item.Item, noItemUsed: noItemUsed);
+                historyEntry = new ActionHistoryEntry(ActivePlayerActionEnum.UseItem, initiator, [target], viewItem, noItemUsed: noItemUsed);
             }
         }
         return historyEntry;
@@ -98,11 +135,23 @@ public class Inventory
     // Inventory Models
     public record ViewItem(string Name, string Description, int Count, double Value, int? Duration = 0);
 
-    public record ItemStack(Item Item, int Count)
+    public record ItemStack(Item item, int Count)
     {
+        public Item Item { get; private set; } = item;
+        public int Count { get; private set; } = Count;
         public ViewItem GetViewItem()
         {
-            return new ViewItem(Item.Name, Item.Description, Count, Item.Value);
+            return new ViewItem(Item.Name, Item.Description, Count, Item.Value, Item.Duration);
         }
+
+        public void SubtractCount(int amount)
+        {
+            Count -= amount;
+        }
+        public void SetCount(int amount)
+        {
+            Count = amount;
+        }
+
     };
 }

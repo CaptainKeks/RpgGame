@@ -1,5 +1,6 @@
 ﻿using Game.Charakters;
 using Game.Combat;
+using Game.Utilities;
 
 namespace Game.Menus;
 
@@ -42,12 +43,14 @@ class CharakterMenu : Menu
             switch (input)
             {
                 case "1":
+                    Shop.CreateNewShop();
                     var player = new Player(new Warrior());
                     fight = new Fight(player, new EnemyGenerator(new Ork(), rnd.Next(1, 2), fight));
                     nextMenu = new FightMenu(player, fight);
                     validInput = true;
                     break;
                 case "2":
+                    Shop.CreateNewShop();
                     player = new Player(new Mage());
                     fight = new Fight(player, new EnemyGenerator((new Ork()), rnd.Next(1, 2), fight));
                     nextMenu = new FightMenu(player, fight);

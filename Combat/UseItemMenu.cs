@@ -1,7 +1,6 @@
 ﻿using Game.Charakters;
-using Game.Items;
 using Game.Menus;
-using static Game.Combat.Fight;
+using System.Runtime.CompilerServices;
 
 namespace Game.Combat;
 class UseItemMenu : Menu
@@ -14,14 +13,69 @@ class UseItemMenu : Menu
         Console.WriteLine("wähle ein Item aus:");
     }
 
-    public UseItemMenu(Entity player, out bool noItemUsed, out PlayerChoice historyEntry)
+    public UseItemMenu(Entity player, out bool noItemUsed, out PlayerChoice choice)
     {
-       var content = player.Inventory.GetInventoryContents();
+        var content = player.Inventory.GetInventoryContents();
         for (int i = 0; i < content.Length; i++)
             Console.WriteLine($"[{i}] {content[i].Name} ({content[i].Count}) <{content[i].Description}>");
         Console.WriteLine($"[{content.Length}] zurück zum Kampf");
-        historyEntry = HandleInput(player, out noItemUsed);
+        // historyEntry = HandleInput(player, out noItemUsed);
+        int input = GetUserInputNumber();
+        choice = HandleInput(content, player, input, out noItemUsed);
     }
+
+
+    private PlayerChoice HandleInput(Inventory.ViewItem[] content, Entity player, int input, out bool noItemUsed)
+    {
+        PlayerChoice choice = null;
+        noItemUsed = false;
+        for (int i = 0; i < content.Length; i++)
+        {
+            if (content.Length > input)
+            {
+                if (content[i].Name == player.Inventory.Items[input].Item.Name)
+                {
+                    noItemUsed = false;
+                    choice = new PlayerChoice(ActivePlayerActionEnum.UseItem, player, [], player.Inventory.Items[i].GetViewItem());
+                }
+            }
+            else if (content.Length == input)
+            {
+                noItemUsed = true;
+                return choice;
+            }
+            else
+            {
+                noItemUsed = true;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Falscher Input");
+                Console.ForegroundColor = ConsoleColor.White;
+                input = GetUserInputNumber();
+                choice = HandleInput(content, player, input, out noItemUsed);
+                return choice;
+            }
+        }
+        return choice;
+    }
+
+    private int GetUserInputNumber()
+    {
+        int result = default;
+        Console.Write("> ");
+        string? input = Console.ReadLine();
+        while (!int.TryParse(input, out result))
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Gib eine Gültige Zahl ein.");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write("> ");
+            input = Console.ReadLine();
+        }
+        return result;
+    }
+
+
+
 
     private PlayerChoice HandleInput(Entity player, out bool noItemUsed)
     {
@@ -29,7 +83,6 @@ class UseItemMenu : Menu
         noItemUsed = false;
         string input = "";
         bool validInput = false;
-
         while (!validInput)
         {
             Console.Write("> ");
@@ -39,11 +92,11 @@ class UseItemMenu : Menu
             switch (input)
             {
                 case "0":
-                    choice = new PlayerChoice(ActivePlayerActionEnum.UseItem, player, [], player.Inventory.Items[id].Item);
+                    choice = new PlayerChoice(ActivePlayerActionEnum.UseItem, player, [], player.Inventory.Items[id].GetViewItem());
                     validInput = true;
                     break;
                 case "1":
-                    choice = new PlayerChoice(ActivePlayerActionEnum.UseItem, player, [], player.Inventory.Items[id].Item);
+                    choice = new PlayerChoice(ActivePlayerActionEnum.UseItem, player, [], player.Inventory.Items[id].GetViewItem());
                     validInput = true;
                     break;
                 case "2":

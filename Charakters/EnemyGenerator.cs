@@ -11,7 +11,7 @@ public class EnemyGenerator
     {
         for (int i = 0; i < amount; i++)
         {
-            Enemy enemy = new Enemy(@class, fight);
+            Enemy enemy = new Enemy(@class, fight.Level);
             Enemies.Add(enemy);
         }
     }

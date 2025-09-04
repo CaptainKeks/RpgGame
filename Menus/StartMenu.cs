@@ -15,11 +15,11 @@ class StartMenu : Menu
     {
         Console.WriteLine("---------------------");
         Console.ForegroundColor = ConsoleColor.DarkYellow;
-        Console.WriteLine($"Gold: {player.MetaProgression.Gold}");
+        Console.WriteLine($"Gold: {player.Inventory.Gold}");
         Console.ForegroundColor = ConsoleColor.Green;
-        Console.Write($"Wins: {player.MetaProgression.Wins}");
+        Console.Write($"Wins: {player.Stats.Wins}");
         Console.ForegroundColor = ConsoleColor.DarkRed;
-        Console.WriteLine($" Losses: {player.MetaProgression.Losses}");
+        Console.WriteLine($" Losses: {player.Stats.Losses}");
         Console.ForegroundColor = ConsoleColor.White;
         Console.WriteLine("---------------------");
         Console.WriteLine();

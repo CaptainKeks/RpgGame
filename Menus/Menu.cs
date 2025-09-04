@@ -1,6 +1,6 @@
 ﻿namespace Game.Menus;
 
-abstract class Menu
+public abstract class Menu
 {
     public Menu()
     {

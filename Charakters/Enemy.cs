@@ -1,25 +1,31 @@
 ﻿using Game.Combat;
 using Game.Items;
-using System;
+using Newtonsoft.Json;
 
 namespace Game.Charakters;
 
 public class Enemy : Entity
 {
-    public Enemy(Class @class, Fight fight) : base(@class)
+    public Enemy(Class @class, int level = 1) : base(@class)
     {
         Random rnd = new Random();
-        MaxHealth = (GetMaxHealthValue() - 8) + (4 * fight.Level);
+        MaxHealth = (GetMaxHealthValue() - 8) + (4 * level);
         CurrentHealth = MaxHealth;
-        Class.AttackModifier = rnd.Next((int)(Class.AttackModifier + (fight.Level * 1.5) - 2), (int)(Class.AttackModifier + (fight.Level * 1.5) + 2));
-        Inventory.AddItem(new GiftTrank("GiftTrank", 5));
+        Class.AttackModifier = rnd.Next((int)(Class.AttackModifier + (level * 1.5) - 2), (int)(Class.AttackModifier + (level * 1.5) + 2));
+        Inventory.AddItem(new GiftTrank("GiftTrank", 5, 2));
     }
 
+    [JsonProperty]
     public override string Name { get; protected set; } = "Orga";
+    [JsonProperty]
     public override double BaseAttack { get; protected set; } = 4;
+    [JsonProperty]
     public override double BaseDefence { get; protected set; } = 3;
+    [JsonProperty]
     public override double BaseWisdom { get; protected set; } = 0;
+    [JsonProperty]
     public override double MaxHealth { get; protected set; } = 25;
+    [JsonProperty]
     public override double BaseHealth { get; protected set; } = 25;
 
     /// <summary>

@@ -1,10 +1,8 @@
 ﻿using Game.Charakters;
 using Game.Combat;
 using Game.Helper;
-using System.Runtime;
-using System.Security.Cryptography.X509Certificates;
-using System.Xml.Linq;
-using static Game.Combat.Fight;
+using Game.Items;
+using Game.Utilities;
 
 namespace Game.Menus;
 class FightMenu : Menu
@@ -34,23 +32,12 @@ class FightMenu : Menu
         Console.WriteLine();
         Console.WriteLine("----------");
         Console.ForegroundColor = ConsoleColor.DarkYellow;
-        Console.WriteLine($"Gold: {player.MetaProgression.Gold}");
+        Console.WriteLine($"Gold: {player.Inventory.Gold}");
         Console.ForegroundColor = ConsoleColor.White;
         Console.WriteLine("----------");
     }
-    public FightMenu(Entity player, Fight fight) // -> zusätzlich Fight übergeben
+    public FightMenu(Player player, Fight fight)
     {
-        // vor der entscheidung fight property darstellen
-        // -> alle informationen die nötig sind für spieler 
-        // unter anderm auch mögliche Entscheidungen 
-
-        // Spieler füllt alle relavaten entscheidungen für Runde -> Entscheidungs object oder einfacher
-
-        // Entscheidungs bzw. Options Objekt an Fight übergeben 
-        // Fight bearbeitet die Entscheidung -> berechnet Konsequenzen
-
-        // -> ausirkungen werden in nächster Loop oder ende je nach entscheidung dargestellt
-
         Random rnd = new Random();
 
         while (!fight.isGameFinished)
@@ -66,33 +53,10 @@ class FightMenu : Menu
             DisplayEnteties(player, fight);
             PrintMenuRoundAndTurn(fight);
             PrintMenuEnemyMove(fight);
-            SaveAndLoadJson.SaveFight(fight);
+            SaveAndLoadJson.SaveGame(new GameSaves(player, fight, Shop.Instance));
         }
     }
-    public FightMenu(Entity player, FightValues newFightValues)
-    {
-        this.fightValues = newFightValues;
-        bool isFinished = false;
-        bool isLevelFinished = true;
 
-        List<Entity> newEnemies = [];
-        while (!isFinished)
-        {
-            if (isLevelFinished)
-            {
-
-            }
-            isLevelFinished = false;
-            fightValues.Turn = 0;
-            fightValues.Turn++;
-            if (isLevelFinished)
-            {
-                fightValues.Level++;
-                fightValues.Turn = 0;
-                fightValues.Round = 0;
-            }
-        }
-    }
     private void PrintMenuRoundAndTurn(Fight fight)
     {
         Console.ForegroundColor = ConsoleColor.Magenta;
@@ -109,9 +73,9 @@ class FightMenu : Menu
         foreach (var historyEntry in historyEntrys)
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write($"{historyEntry.Value}");
+            Console.Write($"{historyEntry.StatusEffektValue}");
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine($" Giftschaden wurden {historyEntry.Target[0].Name} hinzugefügt. (Runden: {historyEntry.Duration}) verbleibend.");
+            Console.WriteLine($" Giftschaden wurden {historyEntry.Target[0].Name} hinzugefügt. (Runden: {historyEntry.StatusEffektDuration}) verbleibend.");
             Console.WriteLine();
         }
     }
@@ -129,7 +93,7 @@ class FightMenu : Menu
     {
         ActionHistoryEntry historyEntry = null;
         var options = fight.GetAvailableOptions();
-        var choice = GetUserInputs(options, fight, out PlayerChoice itemMenuChoice, out bool noItemUsed);
+        var choice = GetUserInputs(options, fight, out bool noItemUsed);
 
         if (choice.Action == ActivePlayerActionEnum.UseItem && noItemUsed)
         {
@@ -138,11 +102,8 @@ class FightMenu : Menu
             PrintMenuPlayerMove(fight);
         }
 
-        if (choice.Action == ActivePlayerActionEnum.UseItem)
-            historyEntry = fight.PlayerMoveForRound(itemMenuChoice);
 
-        if (choice.Action != ActivePlayerActionEnum.UseItem)
-            historyEntry = fight.PlayerMoveForRound(choice);
+        historyEntry = fight.PlayerMoveForRound(choice);
         PrintHistoryEntry(historyEntry, fight);
     }
 
@@ -150,18 +111,6 @@ class FightMenu : Menu
     {
         if (historyEntry == null)
             return;
-
-        if (historyEntry.PassiveAction != null)
-        {
-            switch (historyEntry.PassiveAction)
-            {
-                case PassiveActionEnum.ApplyStatusEffect:
-
-                    break;
-            }
-        }
-
-
 
         if (historyEntry.ActiveAction != null)
         {
@@ -199,9 +148,22 @@ class FightMenu : Menu
 
                 case ActivePlayerActionEnum.UseItem:
                     Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine($"Wirke {historyEntry.Item.Name} auf {historyEntry.Target[0].Name} für {historyEntry.Item.Duration} Runden.");
+
+                    if (historyEntry.Item.Name == "HeilTrank")
+                    {
+                        if (historyEntry.healed <= 0)
+                            Console.WriteLine("Du kannst dich nicht Heilen du hast schon volles Leben!");
+                        Console.WriteLine($"Heiltrank hat {historyEntry.Initiator.Name} um {historyEntry.healed:F2} geheilt.");
+                    }
+
+                    if (historyEntry.Item.Name == "GiftTrank")
+                    {
+                        Console.WriteLine($"Wirke {historyEntry.Item.Name} auf {historyEntry.Target[0].Name} für {historyEntry.Item.Duration} Runden, mit Jeweils {historyEntry.Item.Value} Schaden.");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.WriteLine();
+                    }
+
                     Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine();
                     Console.Write("Drücke [Enter] für den nächsten Zug.");
                     Console.ReadKey();
                     break;
@@ -209,50 +171,27 @@ class FightMenu : Menu
         }
     }
 
-    private PlayerChoice GetUserInputs(AvailableOptions options, Fight fight, out PlayerChoice choice, out bool noItemUsed)
+    private PlayerChoice GetUserInputs(AvailableOptions options, Fight fight, out bool noItemUsed)
     {
-        choice = null;
+        PlayerChoice choice = null;
+        Entity target = null;
         noItemUsed = false;
         int availableTargetIndex = 0;
-        // Available Options darstellen
         DisplayAvailableOptions(options);
 
-        // User Input holen
         int choiceNumber = GetUserInputNumber();
-        while (!Enum.IsDefined(typeof(ActivePlayerActionEnum), choiceNumber))
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Gib eine Gültige Zahl ein!");
-            Console.ForegroundColor = ConsoleColor.White;
-            choiceNumber = GetUserInputNumber();
-        }
         var action = (ActivePlayerActionEnum)choiceNumber;
-
         var availableTargets = fight.GetAvailableTargets(action);
 
-        if (action == ActivePlayerActionEnum.UseItem)
-        {
-            Menu nextMenu = new UseItemMenu(fight.Player, out noItemUsed, out choice);
-        }
+        CastInputToEnum(choiceNumber);
+        OpenFleeOrUseItemMenu(action, fight, out noItemUsed, out choice);
 
-        if (action == ActivePlayerActionEnum.Flee)
-        {
-            SaveAndLoadJson.SaveFight(fight);
-            SaveAndLoadJson.SaveGame(fight.Player);
-            Programm.Main();
-        }
         if (!noItemUsed)
         {
-            // Player options für Target darstellen
-            Console.Clear();
-            DisplayEnteties(fight.Player, fight);
-            PrintMenuRoundAndTurn(fight);
-            DisplayAvailableTargets(availableTargets);
-
-            // Get player input for Target
+            PrintOptionsForTarget(fight, availableTargets);
             availableTargetIndex = GetUserInputNumber();
         }
-        Entity target = null;
+
         while (availableTargetIndex <= availableTargets.Count)
             try
             {
@@ -266,8 +205,57 @@ class FightMenu : Menu
                 target = availableTargets.ElementAt(availableTargetIndex);
             }
 
-        // User input zu Player Choice verwandln
-        return new PlayerChoice(action, fight.Player, [target]);
+        if (choice != null)
+            return new PlayerChoice(action, fight.Player, [target], choice.ViewItem);
+        else
+            return new PlayerChoice(action, fight.Player, [target]);
+    }
+
+    /// <summary>
+    /// Opens the Menu and returns the User Inputs in form of a PlayerChoice
+    /// </summary>
+    /// <param name="action"></param>
+    /// <param name="fight"></param>
+    /// <param name="noItemUsed"></param>
+    /// <param name="choice"></param>
+    private void OpenFleeOrUseItemMenu(ActivePlayerActionEnum action, Fight fight, out bool noItemUsed, out PlayerChoice choice)
+    {
+        noItemUsed = false;
+        choice = null;
+        if (action == ActivePlayerActionEnum.UseItem)
+        {
+            Menu nextMenu = new UseItemMenu(fight.Player, out noItemUsed, out choice);
+        }
+
+        if (action == ActivePlayerActionEnum.Flee)
+        {
+            SaveAndLoadJson.SaveGame(new GameSaves(fight.Player, fight, Shop.Instance));
+            Programm.Main();
+        }
+    }
+
+    /// <summary>
+    /// Player options für Target darstellen
+    /// </summary>
+    /// <param name="fight"></param>
+    /// <param name="availableTargets"></param>
+    private void PrintOptionsForTarget(Fight fight, List<Entity> availableTargets)
+    {
+        Console.Clear();
+        DisplayEnteties(fight.Player, fight);
+        PrintMenuRoundAndTurn(fight);
+        DisplayAvailableTargets(availableTargets);
+    }
+
+    private void CastInputToEnum(int choiceNumber)
+    {
+        while (!Enum.IsDefined(typeof(ActivePlayerActionEnum), choiceNumber))
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Gib eine Gültige Zahl ein!");
+            Console.ForegroundColor = ConsoleColor.White;
+            choiceNumber = GetUserInputNumber();
+        }
     }
 
     private void DisplayAvailableTargets(List<Entity> availableTargets)
@@ -278,7 +266,7 @@ class FightMenu : Menu
             Console.WriteLine($"[{i++}]{target.GetShortInfo()}");
     }
 
-    private static int GetUserInputNumber()
+    private int GetUserInputNumber()
     {
         int result = default;
         Console.Write("> ");

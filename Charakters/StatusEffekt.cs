@@ -18,7 +18,7 @@ public class StatusEffekt
         Value = value;
     }
 
-    public Fight.ActionHistoryEntry ApplyStatusAffect(Entity target)
+    public ActionHistoryEntry ApplyStatusAffect(Entity target)
     {
         double damage = 0;
         if (Duration < 1)
@@ -27,7 +27,7 @@ public class StatusEffekt
         damage = target.CurrentHealth > Value ? Value : target.CurrentHealth;
         target.CurrentHealth -= damage;
         Duration--;
-        return new Fight.ActionHistoryEntry(null, Fight.PassiveActionEnum.ApplyStatusEffect, null, [target], Duration: Duration, Value: Value);
+        return new ActionHistoryEntry(null, null, [target], StatusEffektDuration: Duration, StatusEffektValue: Value);
     }
 
     public void RemoveElapsedStatusEffect(Entity target)

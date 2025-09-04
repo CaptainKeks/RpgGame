@@ -1,25 +1,40 @@
 ﻿
 using Game.Combat;
-using Game.Items;
-using System.Numerics;
+using Game.Utilities;
+using Newtonsoft.Json;
 
 namespace Game.Charakters;
 
 public abstract class Entity
 {
+    [JsonProperty]
     public virtual string Name { get; protected set; }
+    [JsonProperty]
     public virtual double BaseAttack { get; protected set; }
+    [JsonProperty]
     public virtual double BaseDefence { get; protected set; }
+    [JsonProperty]
     public virtual double BaseWisdom { get; protected set; }
+    [JsonProperty]
     public virtual double BaseHealth { get; protected set; }
+    [JsonProperty]
     public virtual double CurrentHealth { get; set; }
+    [JsonProperty]
     public virtual double ActualDamage { get; set; }
+    [JsonProperty]
     public virtual double MaxHealth { get; protected set; }
+    [JsonProperty]
     public virtual bool InDefensePosition { get; set; } = false;
-    public virtual Class Class { get; set; }
-    public virtual Inventory Inventory { get; set; } = new();
+    [JsonProperty]
+    public virtual Class Class { get; protected set; }
+    [JsonProperty]
+    public virtual Inventory Inventory { get; protected set; } = new();
+    [JsonProperty]
     public virtual List<StatusEffekt> StatusEffekts { get; set; } = [];
-    public virtual ShopBonusStats MetaProgression { get; set; } = new(0, 0, 0, 0, 0, 0, 0, 20, 0, 0);
+    [JsonProperty]
+    public virtual ShopBonusStats ShopBonusStats { get; protected set; } = new(0, 0, 0, 0, 0, 0);
+    [JsonProperty]
+    public virtual Stats Stats { get; protected set; } = new(0, 0);
 
 
     // Eine Klasse erstellen für GameSaves wo alle gespeicherten werte drin sind 
@@ -36,7 +51,13 @@ public abstract class Entity
 
     public Entity() { }
 
-    public virtual Fight.ActionHistoryEntry Attack(Entity defender)
+    public void ApplyShopBonusStats(ShopBonusStats shopBonusStats)
+    {
+        ShopBonusStats = shopBonusStats;
+    }
+
+
+    public virtual ActionHistoryEntry Attack(Entity defender)
     {
         ActualDamage = GetAttackValue() - defender.GetDefenseValue();
         ActualDamage = defender.InDefensePosition ? ActualDamage / 2 : ActualDamage;
@@ -44,10 +65,10 @@ public abstract class Entity
         defender.CurrentHealth -= ActualDamage;
         defender.CurrentHealth = defender.CurrentHealth < 0 ? 0 : defender.CurrentHealth;
         defender.InDefensePosition = false;
-        return new Fight.ActionHistoryEntry(Fight.ActivePlayerActionEnum.Attack, null, this, [defender]);
+        return new ActionHistoryEntry(ActivePlayerActionEnum.Attack, this, [defender]);
     }
 
-    public virtual Fight.ActionHistoryEntry SpecialAttack(Entity defender)
+    public virtual ActionHistoryEntry SpecialAttack(Entity defender)
     {
         ActualDamage = (GetSpecialAttackValue() - defender.GetDefenseValue());
         ActualDamage = defender.InDefensePosition ? ActualDamage / 2 : ActualDamage;
@@ -55,46 +76,47 @@ public abstract class Entity
         defender.CurrentHealth -= ActualDamage;
         defender.CurrentHealth = defender.CurrentHealth < 0 ? 0 : defender.CurrentHealth;
         defender.InDefensePosition = false;
-        return new Fight.ActionHistoryEntry(Fight.ActivePlayerActionEnum.SpecialAttack, null, this, [defender]);
+        return new ActionHistoryEntry(ActivePlayerActionEnum.SpecialAttack, this, [defender]);
     }
 
-    public virtual Fight.ActionHistoryEntry GetInDefensePosition()
+    public virtual ActionHistoryEntry GetInDefensePosition()
     {
         InDefensePosition = true;
-        return new Fight.ActionHistoryEntry(Fight.ActivePlayerActionEnum.Defend, null, this, []);
+        return new ActionHistoryEntry(ActivePlayerActionEnum.Defend, this, []);
     }
 
     public virtual double GetAttackValue()
     {
-        return (BaseAttack + MetaProgression.ShopAttackUpgrade + Class.AttackModifier + CurrentHealth * 0.1) * GetWisdomValue();
+        return (BaseAttack + ShopBonusStats.BonusShopAttackStat + Class.AttackModifier + CurrentHealth * 0.1) * GetWisdomValue();
     }
 
     public virtual double GetSpecialAttackValue()
     {
-        return (BaseAttack + MetaProgression.ShopAttackUpgrade + Class.SpecialAttackModifier + CurrentHealth * 0.1) * GetWisdomValue();
+        return (BaseAttack + ShopBonusStats.BonusShopAttackStat + Class.SpecialAttackModifier + CurrentHealth * 0.1) * GetWisdomValue();
     }
 
     public virtual double GetDefenseValue()
     {
-        return (BaseDefence + MetaProgression.ShpoDefenseUpgrade + Class.DefenceModifier) * GetWisdomValue();
+        return (BaseDefence + ShopBonusStats.BonusShopDefenseStat + Class.DefenceModifier) * GetWisdomValue();
     }
 
     public virtual double GetMaxHealthValue()
     {
-        return (BaseHealth + MetaProgression.BonusShopHealthStat + Class.HealthModifier) * GetWisdomValue();
+        return (BaseHealth + ShopBonusStats.BonusShopHealthStat + Class.HealthModifier) * GetWisdomValue();
     }
 
     public virtual double GetWisdomValue()
     {
-        return (BaseWisdom + MetaProgression.BBonusShopWisdomStat + Class.WisdomModifier);
+        return (BaseWisdom + ShopBonusStats.BBonusShopWisdomStat + Class.WisdomModifier);
     }
 
     public virtual void UpgradeBaseValue(BaseValue baseValue)
     {
-        if (MetaProgression.Gold < MetaProgression.Price)
+        if (Inventory.Gold < Shop.Instance.Prices[baseValue])
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("Du hast nicht genügend Gold");
+            Console.WriteLine("Drücke [Enter]");
             Console.ForegroundColor = ConsoleColor.White;
             Console.ReadKey();
             return;
@@ -103,39 +125,39 @@ public abstract class Entity
         switch (baseValue)
         {
             case BaseValue.Attack:
-                UpgradeBaseValues(MetaProgression, m => m.ShopAttackUpgrade, (m, v) => m.ShopAttackUpgrade = v, "Attack", 1);
+                UpgradeBaseValues(ShopBonusStats, m => m.BonusShopAttackStat, (m, v) => m.BonusShopAttackStat = v, "Attack", 1, BaseValue.Attack);
                 Console.ReadKey();
                 break;
             case BaseValue.Defense:
-                UpgradeBaseValues(MetaProgression, m => m.ShpoDefenseUpgrade, (m, v) => m.ShpoDefenseUpgrade = v, "Defense", 1);
+                UpgradeBaseValues(ShopBonusStats, m => m.BonusShopDefenseStat, (m, v) => m.BonusShopDefenseStat = v, "Defense", 1, BaseValue.Defense);
                 Console.ReadKey();
                 break;
             case BaseValue.Wisdom:
-                UpgradeBaseValues(MetaProgression, m => m.BBonusShopWisdomStat, (m, v) => m.BBonusShopWisdomStat = v, "Wisdom", 1);
+                UpgradeBaseValues(ShopBonusStats, m => m.BBonusShopWisdomStat, (m, v) => m.BBonusShopWisdomStat = v, "Wisdom", 1, BaseValue.Wisdom);
                 Console.ReadKey();
                 break;
             case BaseValue.Health:
-                UpgradeBaseValues(MetaProgression, m => m.BonusShopHealthStat, (m, v) => m.BonusShopHealthStat = v, "Health", 5);
+                UpgradeBaseValues(ShopBonusStats, m => m.BonusShopHealthStat, (m, v) => m.BonusShopHealthStat = v, "Health", 5, BaseValue.Health);
                 break;
             case BaseValue.HealthPotion:
-                UpgradeBaseValues(MetaProgression, m => m.HealthPotion, (m, v) => m.HealthPotion = v, "HealthPotion", 5);
+                UpgradeBaseValues(ShopBonusStats, m => m.BonusShopHealthPotionStat, (m, v) => m.BonusShopHealthPotionStat = v, "HealthPotion", 5, BaseValue.HealthPotion);
                 break;
             case BaseValue.PoisenPotion:
-                UpgradeBaseValues(MetaProgression, m => m.PoisonPotion, (m, v) => m.PoisonPotion = v, "PoisonPotion", 1);
+                UpgradeBaseValues(ShopBonusStats, m => m.BonusShopPoisonPotionStat, (m, v) => m.BonusShopPoisonPotionStat = v, "PoisonPotion", 1, BaseValue.PoisenPotion);
                 break;
             default:
                 break;
         }
     }
 
-    private void UpgradeBaseValues(ShopBonusStats meta, Func<ShopBonusStats, double> getter, Action<ShopBonusStats, double> setter, string label, int increment)
+    private void UpgradeBaseValues(ShopBonusStats bonusStats, Func<ShopBonusStats, double> getter, Action<ShopBonusStats, double> setter, string label, int increment, BaseValue baseValue)
     {
-        var current = getter(meta);
-        setter(meta, current + increment);
-        meta.Gold -= meta.Price;
-        meta.Price += 15;
+        var current = getter(bonusStats);
+        setter(bonusStats, current + increment);
+        Inventory.RemoveGold(Shop.Instance.Prices[baseValue], out bool failed);
+        Inventory.HigherPrice(baseValue, 15);
         Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine($"Deine {label} wurde auf {getter(meta)} erhöht.");
+        Console.WriteLine($"Deine {label} wurde auf {getter(bonusStats)} erhöht.");
         Console.ForegroundColor = ConsoleColor.White;
     }
 

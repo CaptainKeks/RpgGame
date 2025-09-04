@@ -1,5 +1,6 @@
 ﻿using Game.Charakters;
 using Game.Combat;
+using Game.Utilities;
 using Newtonsoft.Json;
 
 namespace Game.Helper;
@@ -9,25 +10,15 @@ static class SaveAndLoadJson
     private static JsonSerializerSettings settings = new JsonSerializerSettings
     {
         TypeNameHandling = TypeNameHandling.All,
-        Formatting = Formatting.Indented
+        Formatting = Formatting.Indented,
+        ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor
+        // die settings anpassen
     };
-
-    public static void SaveGame(Entity player)
-    {
-        string text = JsonConvert.SerializeObject(player, settings);
-        File.WriteAllText(AppContext.BaseDirectory + "savegame.json", text);
-    }
 
     public static void SaveGame(GameSaves gameSaves)
     {
         string text = JsonConvert.SerializeObject(gameSaves, settings);
         File.WriteAllText(AppContext.BaseDirectory + "gamesave.json", text);
-    }
-
-    public static void SaveFight(Fight fight)
-    {
-        string text = JsonConvert.SerializeObject(fight, settings);
-        File.WriteAllText(AppContext.BaseDirectory + "saveFight.json", text);
     }
 
     public static Fight LoadFight()
@@ -47,14 +38,18 @@ static class SaveAndLoadJson
         }
     }
 
-    public static Player LoadGame(out bool succeded)
+    public static (Player, Fight) LoadGame(out bool succeded, bool firstLoad = false)
     {
+        succeded = false;
+        GameSaves gameSaves = new GameSaves();
         try
         {
-            string text = File.ReadAllText(AppContext.BaseDirectory + "savegame.json");
-            Player player = JsonConvert.DeserializeObject<Player>(text, settings);
+            if (!File.Exists(AppContext.BaseDirectory + "gamesave.json") && firstLoad)
+                return (new Player(), new Fight());
+            string text = File.ReadAllText(AppContext.BaseDirectory + "gamesave.json");
+            gameSaves = JsonConvert.DeserializeObject<GameSaves>(text, settings);
             succeded = true;
-            return player;
+            return DeserealizeToPlayerAndFight(gameSaves);
         }
         catch (Exception ex)
         {
@@ -65,7 +60,16 @@ static class SaveAndLoadJson
             Console.ForegroundColor = ConsoleColor.White;
             succeded = false;
             Console.ReadKey();
-            return null;
+            return (new Player(), new Fight());
         }
     }
+
+    private static (Player, Fight) DeserealizeToPlayerAndFight(GameSaves gameSaves)
+    {
+        Player player = gameSaves.Player;
+        Fight fight = gameSaves.Fight;
+        Shop.Overwrite(gameSaves.Shop);
+        return (player, fight);
+    }
+
 }

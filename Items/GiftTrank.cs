@@ -16,23 +16,21 @@ class GiftTrank : Item
     public override string Description => $"Ein Grün Blubberndes Getränk das 5 Leben pro Runde schaden macht für {Duration} Runden.";
     public override double Value { get; set; } = 5;
 
-    public override Fight.ActionHistoryEntry UseItem(Entity initiator, Entity target, out bool noItemUsed)
+    public override void UseItem(Entity initiator, Entity target, out bool noItemUsed)
     {
         // MetaProgression Werte addieren
-        var value = Value + initiator.MetaProgression.PoisonPotion;
-            if (target.StatusEffekts.Count < 1)
-            {
-                noItemUsed = false;
-                target.StatusEffekts.Add(new StatusEffekt("Gift", "Fügt jede Runde dem Gegner 5 Schaden zu kann gestäckt werden.", Duration, Value));
-            }
-            else
-            {
-                var query = target.StatusEffekts.Where(e => e.Name == "Gift");
-                foreach (var effekt in query)
-                    effekt.Value += Value;
-                noItemUsed = false;
-            }
-            return new Fight.ActionHistoryEntry(Fight.ActivePlayerActionEnum.UseItem, null, initiator, [target], this, noItemUsed: noItemUsed);
-            
+        var value = Value + initiator.ShopBonusStats.BonusShopPoisonPotionStat;
+        if (target.StatusEffekts.Count < 1)
+        {
+            noItemUsed = false;
+            target.StatusEffekts.Add(new StatusEffekt("Gift", "Fügt jede Runde dem Gegner 5 Schaden zu kann gestäckt werden.", Duration, Value));
+        }
+        else
+        {
+            var query = target.StatusEffekts.Where(e => e.Name == "Gift");
+            foreach (var effekt in query)
+                effekt.Value += Value;
+            noItemUsed = false;
+        }
     }
 }

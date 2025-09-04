@@ -1,5 +1,7 @@
 ﻿using Game.Charakters;
+using Game.Combat;
 using Game.Helper;
+using Game.Utilities;
 namespace Game.Menus;
 
 class UpgradeMenu : Menu
@@ -14,18 +16,42 @@ class UpgradeMenu : Menu
     public UpgradeMenu(Player player)
     {
         Console.ForegroundColor = ConsoleColor.DarkYellow;
-        Console.WriteLine($"Gold: {player.MetaProgression.Gold}");
+        Console.WriteLine($"Gold: {player.Inventory.Gold}");
         Console.ForegroundColor = ConsoleColor.White;
         Console.WriteLine("------------");
         Console.WriteLine();
-        Console.WriteLine($"Preis: {player.MetaProgression.Price} Gold!");
         Console.WriteLine();
-        Console.WriteLine($"[1] Attack       + 1   (Aktueller Wert: {player.MetaProgression.ShopAttackUpgrade})");
-        Console.WriteLine($"[2] Defense      + 1   (Aktueller Wert: {player.MetaProgression.ShpoDefenseUpgrade})");
-        Console.WriteLine($"[3] Wisdom       + 0.1 (Aktueller Wert: {player.MetaProgression.BBonusShopWisdomStat})");
-        Console.WriteLine($"[4] Health       + 5   (Aktueller Wert: {player.MetaProgression.BonusShopHealthStat})");
-        Console.WriteLine($"[5] HealthPotion + 5   (Aktueller Wert: {player.MetaProgression.HealthPotion})");
-        Console.WriteLine($"[6] PoisenPotion + 1   (Aktueller Wert: {player.MetaProgression.PoisonPotion})");
+
+        Console.Write($"[1] Attack        + 1    (Aktueller Wert: {player.ShopBonusStats.BonusShopAttackStat}) \t");
+        Console.ForegroundColor = ConsoleColor.DarkYellow;
+        Console.WriteLine($"Preis: {Shop.Instance.Prices[BaseValue.Attack]} Gold!");
+        Console.ForegroundColor = ConsoleColor.White;
+
+        Console.Write($"[2] Defense       + 1    (Aktueller Wert: {player.ShopBonusStats.BonusShopDefenseStat}) \t");
+        Console.ForegroundColor = ConsoleColor.DarkYellow;
+        Console.WriteLine($"Preis: {Shop.Instance.Prices[BaseValue.Defense]} Gold!");
+        Console.ForegroundColor = ConsoleColor.White;
+
+        Console.Write($"[3] Wisdom        + 0.1  (Aktueller Wert: {player.ShopBonusStats.BBonusShopWisdomStat}) \t");
+        Console.ForegroundColor = ConsoleColor.DarkYellow;
+        Console.WriteLine($"Preis: {Shop.Instance.Prices[BaseValue.Wisdom]} Gold!");
+        Console.ForegroundColor = ConsoleColor.White;
+
+        Console.Write($"[4] Health        + 5    (Aktueller Wert: {player.ShopBonusStats.BonusShopHealthStat}) \t");
+        Console.ForegroundColor = ConsoleColor.DarkYellow;
+        Console.WriteLine($"Preis: {Shop.Instance.Prices[BaseValue.Health]} Gold!");
+        Console.ForegroundColor = ConsoleColor.White;
+
+        Console.Write($"[5] HealthPotion  + 5    (Aktueller Wert: {player.ShopBonusStats.BonusShopHealthPotionStat}) \t");
+        Console.ForegroundColor = ConsoleColor.DarkYellow;
+        Console.WriteLine($"Preis: {Shop.Instance.Prices[BaseValue.HealthPotion]} Gold!");
+        Console.ForegroundColor = ConsoleColor.White;
+
+        Console.Write($"[6] PoisenPotion  + 1    (Aktueller Wert: {player.ShopBonusStats.BonusShopPoisonPotionStat}) \t");
+        Console.ForegroundColor = ConsoleColor.DarkYellow;
+        Console.WriteLine($"Preis: {Shop.Instance.Prices[BaseValue.PoisenPotion]} Gold!");
+        Console.ForegroundColor = ConsoleColor.White;
+
         Console.WriteLine("[7] Zurück");
         HandleInput(player);
     }
@@ -77,7 +103,7 @@ class UpgradeMenu : Menu
                     validInput = true;
                     break;
                 case "7":
-                    SaveAndLoadJson.SaveGame(player);
+                    SaveAndLoadJson.SaveGame(new GameSaves(player, new Fight(), Shop.Instance));
                     nextMenu = new StartMenu(player);
                     Programm.HandleInput(player);
                     validInput = true;
