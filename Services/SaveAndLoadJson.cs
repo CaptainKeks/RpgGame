@@ -29,15 +29,19 @@ static class SaveAndLoadJson
             id = gameSave.ID;
         string text = JsonConvert.SerializeObject(gameSave, settings);
 
-        File.WriteAllText(AppContext.BaseDirectory + $"{id}.json", text);
+        var path =Path.Combine(AppContext.BaseDirectory, "GameSaves");
+        File.WriteAllText(path + $"\\{id}.json", text);
     }
 
-    public static List<GameSave> LoadGames(out bool succeded, bool firstLoad = false)
+    public static List<GameSave> LoadGamesAndCreateFolder(out bool succeded, bool firstLoad = false)
     {
         succeded = false;
         List<GameSave> gameSaves = new List<GameSave>();
+        var path =Path.Combine(AppContext.BaseDirectory, "GameSaves");
+        if (!Directory.Exists(path))
+            Directory.CreateDirectory(path);
 
-        foreach (var file in Directory.GetFiles(AppContext.BaseDirectory, "*.json"))
+        foreach (var file in Directory.GetFiles(path, "*.json"))
         {
             try
             {

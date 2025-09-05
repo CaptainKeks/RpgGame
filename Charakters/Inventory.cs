@@ -103,12 +103,12 @@ public class Inventory
         {
             if (itemStack.Item.Name == viewItem.Name && itemStack.Count > 0)
             {
-                itemStack.Item.UseItem(initiator, target, out noItemUsed);
+                itemStack.Item.UseItem(initiator, target, out noItemUsed, out double healed);
                 itemStack.SubtractCount(1);
                 if (itemStack.Count < 1)
                     initiator.Inventory.Items.Remove(itemStack);
                 noItemUsed = false;
-                return new ActionHistoryEntry(ActivePlayerActionEnum.UseItem, initiator, [target], viewItem, noItemUsed: noItemUsed);
+                return new ActionHistoryEntry(ActivePlayerActionEnum.UseItem, initiator, [target], viewItem, noItemUsed: noItemUsed, healed: healed);
             }
             else
             {
@@ -117,22 +117,7 @@ public class Inventory
             }
         }
         return historyEntry;
-
-        // finde dein Item im inventar 
-        // aktuell noch nach Name später vielleicht ID
-        // Item zu VIewItem finden in Liste
-
-        // prüfen ob es vorhanden ist
-        // Item.Count > 0 sonst Fehler / meldung ans Spieler
-
-        // rufe useItem auf Item auf (weiterleiten) History erhalten und nach oben reichen
-
-        // if consumable -> Count - 1 und löschenb falls <= 0
     }
-
-    // zu jedem Item Typ anders 
-    // z.B Duration gibt es nicht überall
-
 
     // Inventory Models
     public record ViewItem(string Name, string Description, int Count, double Value, int? Duration = 0);

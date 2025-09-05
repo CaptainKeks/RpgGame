@@ -16,9 +16,9 @@ class GiftTrank : Item
     public override string Description => $"Ein Grün Blubberndes Getränk das 5 Leben pro Runde schaden macht für {Duration} Runden.";
     public override double Value { get; set; } = 5;
 
-    public override void UseItem(Entity initiator, Entity target, out bool noItemUsed)
+    public override void UseItem(Entity initiator, Entity target, out bool noItemUsed, out double healed)
     {
-        // MetaProgression Werte addieren
+        healed = 0;
         var value = Value + initiator.ShopBonusStats.BonusShopPoisonPotionStat;
         if (target.StatusEffekts.Count < 1)
         {

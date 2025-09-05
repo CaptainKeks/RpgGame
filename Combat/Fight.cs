@@ -21,21 +21,7 @@ public class Fight
     public bool isGameFinished { get; set; } = false;
     public bool isLevelFinished { get; set; } = false;
 
-
     public Fight() { }
-
-    /// <summary>
-    /// Befüllt Player, Enemies und Enteties
-    /// </summary>
-    /// <param name="player"></param>
-    /// <param name="enemies"></param>
-    public Fight(Player player, List<Enemy> enemies)
-    {
-        Entities.Add(player);
-        Player = player;
-        Entities.AddRange(enemies);
-        Enemies.AddRange(enemies);
-    }
 
     /// <summary>
     /// Befüllt Player, erzeugt neue Enemies und befüllt Enteties

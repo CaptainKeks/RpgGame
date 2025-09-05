@@ -46,11 +46,11 @@ class FightMenu : Menu
             EnemyGenerator enemyGenerator = new EnemyGenerator(new Ork(), 1, gameSave.Fight);
             if (gameSave.Fight.isLevelFinished)
                 gameSave.Fight.CreateNewEnemies(enemyGenerator);
-            DisplayEnteties(gameSave.Player, gameSave.Fight);
+            DisplayEnteties(gameSave.Fight.Player, gameSave.Fight);
             PrintMenuRoundAndTurn(gameSave.Fight);
             PrintStatusEffects(historyEntry);
             PrintMenuPlayerMove(gameSave);
-            DisplayEnteties(gameSave.Player, gameSave.Fight);
+            DisplayEnteties(gameSave.Fight.Player, gameSave.Fight);
             PrintMenuRoundAndTurn(gameSave.Fight);
             PrintMenuEnemyMove(gameSave);
             SaveAndLoadJson.SaveGameAndWriteIDToGameSave(gameSave);
@@ -59,7 +59,7 @@ class FightMenu : Menu
 
     private void PrintMenuRoundAndTurn(Fight fight)
     {
-        Console.ForegroundColor = ConsoleColor.Magenta;
+        Console.ForegroundColor = ConsoleColor.Blue;
         Console.WriteLine($"Level: {fight.Level}");
         Console.ForegroundColor = ConsoleColor.White;
         Console.WriteLine("---------");
@@ -97,7 +97,7 @@ class FightMenu : Menu
 
         if (choice.Action == ActivePlayerActionEnum.UseItem && noItemUsed)
         {
-            DisplayEnteties(gameSave.Fight.Player, gameSave.Fight);
+            DisplayEnteties(gameSave.Player, gameSave.Fight);
             PrintMenuRoundAndTurn(gameSave.Fight);
             PrintMenuPlayerMove(gameSave);
         }

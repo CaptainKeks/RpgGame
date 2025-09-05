@@ -8,7 +8,7 @@ class Programm
 {
     public static void Main()
     {
-        var gameSaves = SaveAndLoadJson.LoadGames(out _, true);
+        var gameSaves = SaveAndLoadJson.LoadGamesAndCreateFolder(out _, true);
         Menu startMenu = new LoadPlayerMenu(gameSaves, out GameSave gameSave);
         HandleInput(gameSave);
     }
@@ -52,7 +52,7 @@ class Programm
                     break;
                 case "4":
                     SaveAndLoadJson.SaveGameAndWriteIDToGameSave(gameSave);
-                    var gameSaves = SaveAndLoadJson.LoadGames(out _);
+                    var gameSaves = SaveAndLoadJson.LoadGamesAndCreateFolder(out _);
                     Menu startMenu = new LoadPlayerMenu(gameSaves, out gameSave);
                     HandleInput(gameSave);
                     validInput = true;

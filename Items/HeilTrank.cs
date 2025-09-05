@@ -12,11 +12,11 @@ namespace Game.Items
         public override double Value { get; set; } = 30;
         public override int Duration { get; set; }
 
-        public override void UseItem(Entity initiator, Entity target, out bool noItemUsed)
+        public override void UseItem(Entity initiator, Entity target, out bool noItemUsed, out double healed)
         {
             // MetaProgression werte addieren
             var value = Value + target.ShopBonusStats.BonusShopHealthPotionStat;
-            double healed = target.MaxHealth - target.CurrentHealth > value ? value : target.MaxHealth - target.CurrentHealth;
+            healed = target.MaxHealth - target.CurrentHealth > value ? value : target.MaxHealth - target.CurrentHealth;
             if (target.CurrentHealth != target.MaxHealth)
             {
                 target.CurrentHealth += healed;
