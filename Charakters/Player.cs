@@ -21,8 +21,6 @@ public class Player : Entity
     }
     public Player()
     {
-        Inventory = new Inventory();
-        Inventory.AddGold(500);
     }
 
     [JsonProperty]

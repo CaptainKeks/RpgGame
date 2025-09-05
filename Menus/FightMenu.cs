@@ -36,24 +36,24 @@ class FightMenu : Menu
         Console.ForegroundColor = ConsoleColor.White;
         Console.WriteLine("----------");
     }
-    public FightMenu(Player player, Fight fight)
+    public FightMenu(GameSave gameSave)
     {
         Random rnd = new Random();
 
-        while (!fight.isGameFinished)
+        while (!gameSave.Fight.isGameFinished)
         {
-            var historyEntry = fight.ApplyStatusEffects();
-            EnemyGenerator enemyGenerator = new EnemyGenerator(new Ork(), 1, fight);
-            if (fight.isLevelFinished)
-                fight.CreateNewEnemies(enemyGenerator);
-            DisplayEnteties(player, fight);
-            PrintMenuRoundAndTurn(fight);
+            var historyEntry = gameSave.Fight.ApplyStatusEffects();
+            EnemyGenerator enemyGenerator = new EnemyGenerator(new Ork(), 1, gameSave.Fight);
+            if (gameSave.Fight.isLevelFinished)
+                gameSave.Fight.CreateNewEnemies(enemyGenerator);
+            DisplayEnteties(gameSave.Player, gameSave.Fight);
+            PrintMenuRoundAndTurn(gameSave.Fight);
             PrintStatusEffects(historyEntry);
-            PrintMenuPlayerMove(fight);
-            DisplayEnteties(player, fight);
-            PrintMenuRoundAndTurn(fight);
-            PrintMenuEnemyMove(fight);
-            SaveAndLoadJson.SaveGame(new GameSaves(player, fight, Shop.Instance));
+            PrintMenuPlayerMove(gameSave);
+            DisplayEnteties(gameSave.Player, gameSave.Fight);
+            PrintMenuRoundAndTurn(gameSave.Fight);
+            PrintMenuEnemyMove(gameSave);
+            SaveAndLoadJson.SaveGameAndWriteIDToGameSave(gameSave);
         }
     }
 
@@ -80,31 +80,31 @@ class FightMenu : Menu
         }
     }
 
-    private void PrintMenuEnemyMove(Fight fight)
+    private void PrintMenuEnemyMove(GameSave gameSave)
     {
         Console.WriteLine("Der/Die Gegner ist/sind am Zug.");
         Console.WriteLine();
-        var historyEntrys = fight.EnemyMoveForRound();
+        var historyEntrys = gameSave.Fight.EnemyMoveForRound(gameSave);
         foreach (var entry in historyEntrys)
-            PrintHistoryEntry(entry, fight);
+            PrintHistoryEntry(entry, gameSave.Fight);
     }
 
-    private void PrintMenuPlayerMove(Fight fight)
+    private void PrintMenuPlayerMove(GameSave gameSave)
     {
         ActionHistoryEntry historyEntry = null;
-        var options = fight.GetAvailableOptions();
-        var choice = GetUserInputs(options, fight, out bool noItemUsed);
+        var options = gameSave.Fight.GetAvailableOptions();
+        var choice = GetUserInputs(options, gameSave, out bool noItemUsed);
 
         if (choice.Action == ActivePlayerActionEnum.UseItem && noItemUsed)
         {
-            DisplayEnteties(fight.Player, fight);
-            PrintMenuRoundAndTurn(fight);
-            PrintMenuPlayerMove(fight);
+            DisplayEnteties(gameSave.Fight.Player, gameSave.Fight);
+            PrintMenuRoundAndTurn(gameSave.Fight);
+            PrintMenuPlayerMove(gameSave);
         }
 
 
-        historyEntry = fight.PlayerMoveForRound(choice);
-        PrintHistoryEntry(historyEntry, fight);
+        historyEntry = gameSave.Fight.PlayerMoveForRound(choice, gameSave);
+        PrintHistoryEntry(historyEntry, gameSave.Fight);
     }
 
     private void PrintHistoryEntry(ActionHistoryEntry historyEntry, Fight fight)
@@ -171,7 +171,7 @@ class FightMenu : Menu
         }
     }
 
-    private PlayerChoice GetUserInputs(AvailableOptions options, Fight fight, out bool noItemUsed)
+    private PlayerChoice GetUserInputs(AvailableOptions options, GameSave gameSave, out bool noItemUsed)
     {
         PlayerChoice choice = null;
         Entity target = null;
@@ -181,14 +181,14 @@ class FightMenu : Menu
 
         int choiceNumber = GetUserInputNumber();
         var action = (ActivePlayerActionEnum)choiceNumber;
-        var availableTargets = fight.GetAvailableTargets(action);
+        var availableTargets = gameSave.Fight.GetAvailableTargets(action);
 
         CastInputToEnum(choiceNumber);
-        OpenFleeOrUseItemMenu(action, fight, out noItemUsed, out choice);
+        OpenFleeOrUseItemMenu(action, gameSave, out noItemUsed, out choice);
 
         if (!noItemUsed)
         {
-            PrintOptionsForTarget(fight, availableTargets);
+            PrintOptionsForTarget(gameSave.Fight, availableTargets);
             availableTargetIndex = GetUserInputNumber();
         }
 
@@ -206,9 +206,9 @@ class FightMenu : Menu
             }
 
         if (choice != null)
-            return new PlayerChoice(action, fight.Player, [target], choice.ViewItem);
+            return new PlayerChoice(action, gameSave.Fight.Player, [target], choice.ViewItem);
         else
-            return new PlayerChoice(action, fight.Player, [target]);
+            return new PlayerChoice(action, gameSave.Fight.Player, [target]);
     }
 
     /// <summary>
@@ -218,18 +218,18 @@ class FightMenu : Menu
     /// <param name="fight"></param>
     /// <param name="noItemUsed"></param>
     /// <param name="choice"></param>
-    private void OpenFleeOrUseItemMenu(ActivePlayerActionEnum action, Fight fight, out bool noItemUsed, out PlayerChoice choice)
+    private void OpenFleeOrUseItemMenu(ActivePlayerActionEnum action, GameSave gameSave, out bool noItemUsed, out PlayerChoice choice)
     {
         noItemUsed = false;
         choice = null;
         if (action == ActivePlayerActionEnum.UseItem)
         {
-            Menu nextMenu = new UseItemMenu(fight.Player, out noItemUsed, out choice);
+            Menu nextMenu = new UseItemMenu(gameSave.Fight.Player, out noItemUsed, out choice);
         }
 
         if (action == ActivePlayerActionEnum.Flee)
         {
-            SaveAndLoadJson.SaveGame(new GameSaves(fight.Player, fight, Shop.Instance));
+            SaveAndLoadJson.SaveGameAndWriteIDToGameSave(gameSave);
             Programm.Main();
         }
     }

@@ -1,7 +1,4 @@
-﻿using Game.Charakters;
-using Game.Combat;
-using Game.Utilities;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Game.Helper;
 
@@ -15,61 +12,55 @@ static class SaveAndLoadJson
         // die settings anpassen
     };
 
-    public static void SaveGame(GameSaves gameSaves)
+    public static void DeleteGameSaveFile(GameSave gameSave)
     {
-        string text = JsonConvert.SerializeObject(gameSaves, settings);
-        File.WriteAllText(AppContext.BaseDirectory + "gamesave.json", text);
+        File.Delete(AppContext.BaseDirectory + $"{gameSave.ID}.json");
     }
 
-    public static Fight LoadFight()
+    public static void SaveGameAndWriteIDToGameSave(GameSave gameSave)
     {
-        try
+        Guid id = Guid.Empty;
+        if (gameSave.ID == Guid.Empty)
         {
-            var fight = new Fight();
-            string text = File.ReadAllText(AppContext.BaseDirectory + "saveFight.json");
-            fight = JsonConvert.DeserializeObject<Fight>(text, settings);
-            return fight;
+            id = Guid.NewGuid();
+            gameSave.ID = id;
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            Console.ReadKey();
-            return new Fight();
-        }
+        else
+            id = gameSave.ID;
+        string text = JsonConvert.SerializeObject(gameSave, settings);
+
+        File.WriteAllText(AppContext.BaseDirectory + $"{id}.json", text);
     }
 
-    public static (Player, Fight) LoadGame(out bool succeded, bool firstLoad = false)
+    public static List<GameSave> LoadGames(out bool succeded, bool firstLoad = false)
     {
         succeded = false;
-        GameSaves gameSaves = new GameSaves();
-        try
-        {
-            if (!File.Exists(AppContext.BaseDirectory + "gamesave.json") && firstLoad)
-                return (new Player(), new Fight());
-            string text = File.ReadAllText(AppContext.BaseDirectory + "gamesave.json");
-            gameSaves = JsonConvert.DeserializeObject<GameSaves>(text, settings);
-            succeded = true;
-            return DeserealizeToPlayerAndFight(gameSaves);
-        }
-        catch (Exception ex)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Fehler: ");
-            Console.WriteLine(ex.Message);
-            Console.WriteLine("Erstelle zuerst ein Neues Spiel.");
-            Console.ForegroundColor = ConsoleColor.White;
-            succeded = false;
-            Console.ReadKey();
-            return (new Player(), new Fight());
-        }
-    }
+        List<GameSave> gameSaves = new List<GameSave>();
 
-    private static (Player, Fight) DeserealizeToPlayerAndFight(GameSaves gameSaves)
-    {
-        Player player = gameSaves.Player;
-        Fight fight = gameSaves.Fight;
-        Shop.Overwrite(gameSaves.Shop);
-        return (player, fight);
+        foreach (var file in Directory.GetFiles(AppContext.BaseDirectory, "*.json"))
+        {
+            try
+            {
+                if (!File.Exists(file) && firstLoad)
+                    return [];
+                string text = File.ReadAllText(file);
+                var save = JsonConvert.DeserializeObject<GameSave>(text, settings);
+                succeded = true;
+                if (save.ID != Guid.Empty)
+                    gameSaves.Add(save);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Fehler: ");
+                Console.WriteLine(ex.Message);
+                Console.WriteLine("Erstelle zuerst ein Neues Spiel.");
+                Console.ForegroundColor = ConsoleColor.White;
+                succeded = false;
+                Console.ReadKey();
+                return [];
+            }
+        }
+        return gameSaves;
     }
-
 }

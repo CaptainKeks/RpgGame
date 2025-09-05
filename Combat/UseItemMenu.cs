@@ -73,46 +73,4 @@ class UseItemMenu : Menu
         }
         return result;
     }
-
-
-
-
-    private PlayerChoice HandleInput(Entity player, out bool noItemUsed)
-    {
-        PlayerChoice choice = null;
-        noItemUsed = false;
-        string input = "";
-        bool validInput = false;
-        while (!validInput)
-        {
-            Console.Write("> ");
-            input = Console.ReadLine();
-            int id = Convert.ToInt32(input);
-
-            switch (input)
-            {
-                case "0":
-                    choice = new PlayerChoice(ActivePlayerActionEnum.UseItem, player, [], player.Inventory.Items[id].GetViewItem());
-                    validInput = true;
-                    break;
-                case "1":
-                    choice = new PlayerChoice(ActivePlayerActionEnum.UseItem, player, [], player.Inventory.Items[id].GetViewItem());
-                    validInput = true;
-                    break;
-                case "2":
-                    choice = null;
-                    noItemUsed = true;
-                    validInput = true;
-                    break;
-                default:
-                    choice = null;
-                    validInput = false;
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Falscher Input");
-                    Console.ForegroundColor = ConsoleColor.White;
-                    break;
-            }
-        }
-        return choice;
-    }
 }

@@ -86,13 +86,13 @@ public class Fight
     /// </summary>
     /// <param name="decision"></param>
     /// <returns></returns>
-    public ActionHistoryEntry PlayerMoveForRound(PlayerChoice decision)
+    public ActionHistoryEntry PlayerMoveForRound(PlayerChoice decision, GameSave gameSave)
     {
         if (decision == null)
             return null;
 
         ActionHistoryEntry historyEntry = null;
-        TryIfHealthIsZero(Player, Enemies);
+        TryIfHealthIsZero(gameSave);
 
         switch (decision.Action)
         {
@@ -120,11 +120,11 @@ public class Fight
     /// Führt eine Aktion aus die durch Zufall generiert wird. Und zählt die Runde eins höher
     /// </summary>
     /// <returns></returns>
-    public List<ActionHistoryEntry> EnemyMoveForRound()
+    public List<ActionHistoryEntry> EnemyMoveForRound(GameSave gameSave)
     {
         List<ActionHistoryEntry> list = new List<ActionHistoryEntry>();
         ActionHistoryEntry historyEntry = null;
-        TryIfHealthIsZero(Player, Enemies);
+        TryIfHealthIsZero(gameSave);
 
         foreach (var enemy in Enemies)
         {
@@ -188,26 +188,26 @@ public class Fight
     /// </summary>
     /// <param name="player"></param>
     /// <param name="enemies"></param>
-    private void TryIfHealthIsZero(Player player, List<Enemy> enemies)
+    private void TryIfHealthIsZero(GameSave gameSave)
     {
         isLevelFinished = false;
-        foreach (var enemy in enemies)
+        foreach (var enemy in gameSave.Fight.Enemies)
             if (enemy.CurrentHealth <= 0)
             {
-                player.Inventory.AddGold(12);
-                enemies.Remove(enemy);
+                gameSave.Player.Inventory.AddGold(12);
+                gameSave.Fight.Enemies.Remove(enemy);
                 Entities.Remove(enemy);
                 break;
             }
 
-        bool playerLooses = player.CurrentHealth <= 0;
-        bool playerLevelWin = enemies.Count == 0;
+        bool playerLooses = gameSave.Player.CurrentHealth <= 0;
+        bool playerLevelWin = gameSave.Fight.Enemies.Count == 0;
         bool playerWins = playerLevelWin && Level == MaxLevel;
 
         if (playerWins)
         {
-            player.Stats.Wins += 1;
-            SaveAndLoadJson.SaveGame(new GameSaves(player, new Fight(), Shop.Instance));
+            gameSave.Player.Stats.Wins += 1;
+            SaveAndLoadJson.SaveGameAndWriteIDToGameSave(gameSave);
             Menu nextMenu = new WinnerMenu();
             isGameFinished = true;
             isLevelFinished = true;
@@ -223,8 +223,8 @@ public class Fight
 
         if (playerLooses)
         {
-            player.Stats.Losses += 1;
-            SaveAndLoadJson.SaveGame(new GameSaves(player, new Fight(), Shop.Instance));
+            gameSave.Player.Stats.Losses += 1;
+            SaveAndLoadJson.DeleteGameSaveFile(gameSave);
             Menu nextMenu = new LoosingMenu();
             isGameFinished = true;
             isLevelFinished = true;

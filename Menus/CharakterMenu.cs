@@ -22,17 +22,17 @@ class CharakterMenu : Menu
         Console.ForegroundColor = ConsoleColor.White;
     }
 
-    public CharakterMenu()
+    public CharakterMenu(GameSave gameSave)
     {
-        HandleInput();
+        HandleInput(gameSave);
     }
 
-    private void HandleInput()
+    private void HandleInput(GameSave gameSave)
     {
         Menu nextMenu;
         string input;
         bool validInput = false;
-        var fight = new Fight();
+        gameSave.Fight = new Fight();
         Random rnd = new Random();
 
         while (true)
@@ -44,16 +44,16 @@ class CharakterMenu : Menu
             {
                 case "1":
                     Shop.CreateNewShop();
-                    var player = new Player(new Warrior());
-                    fight = new Fight(player, new EnemyGenerator(new Ork(), rnd.Next(1, 2), fight));
-                    nextMenu = new FightMenu(player, fight);
+                    gameSave.Player = new Player(new Warrior());
+                    gameSave.Fight = new Fight(gameSave.Player, new EnemyGenerator(new Ork(), rnd.Next(1, 4), gameSave.Fight));
+                    nextMenu = new FightMenu(gameSave);
                     validInput = true;
                     break;
                 case "2":
                     Shop.CreateNewShop();
-                    player = new Player(new Mage());
-                    fight = new Fight(player, new EnemyGenerator((new Ork()), rnd.Next(1, 2), fight));
-                    nextMenu = new FightMenu(player, fight);
+                    gameSave.Player = new Player(new Mage());
+                    gameSave.Fight = new Fight(gameSave.Player, new EnemyGenerator((new Ork()), rnd.Next(1, 4), gameSave.Fight));
+                    nextMenu = new FightMenu(gameSave);
                     validInput = true;
                     break;
                 case "3":

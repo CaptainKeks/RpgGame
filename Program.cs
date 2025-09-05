@@ -2,51 +2,44 @@
 using Game.Charakters;
 using Game.Combat;
 using Game.Helper;
-using Game.Items;
 using Game.Menus;
-using Game.Utilities;
 
 class Programm
 {
     public static void Main()
     {
-        var (player, fight) = SaveAndLoadJson.LoadGame(out _, true);
-        Menu startMenu = new StartMenu(player);
-        HandleInput(player, fight);
+        var gameSaves = SaveAndLoadJson.LoadGames(out _, true);
+        Menu startMenu = new LoadPlayerMenu(gameSaves, out GameSave gameSave);
+        HandleInput(gameSave);
     }
 
-    public static void HandleInput(Player? player = null, Fight? fight = null)
+    public static void HandleInput(GameSave gameSave)
     {
-        List<Entity> enemies;
+        Random rnd = new Random();
         string input;
-        while (true)
+        bool validInput = false;
+        while (!validInput)
         {
             Console.Write("> ");
             input = Console.ReadLine();
-            bool validInput = false;
             switch (input)
             {
                 case "1":
-                    // Neues Spiel erstellen
+                    // Neuen Run erstellen
                     validInput = true;
-                    Menu nextMenu = new CharakterMenu();
+                    gameSave.Fight = new Fight(gameSave.Player, new EnemyGenerator(new Ork(), rnd.Next(1, 4), gameSave.Fight));
+                    Menu nextMenu = new FightMenu(gameSave);
                     break;
                 case "2":
                     // Spiel Laden
-                    (player, fight) = SaveAndLoadJson.LoadGame(out bool succeeded);
-                    if (!succeeded)
-                    {
-                        break;
-                    }
-                    nextMenu = new FightMenu(player, fight);
+                    nextMenu = new FightMenu(gameSave);
                     validInput = true;
                     break;
                 case "3":
                     // Upgrade durchführen
-                    if (player != null)
+                    if (gameSave.Player != null)
                     {
-                        SaveAndLoadJson.LoadGame(out _);
-                        nextMenu = new UpgradeMenu(player);
+                        nextMenu = new UpgradeMenu(gameSave);
                         validInput = true;
                     }
                     else
@@ -58,8 +51,10 @@ class Programm
                     }
                     break;
                 case "4":
-                    SaveAndLoadJson.SaveGame(new GameSaves(player, new Fight(), Shop.Instance));
-                    Environment.Exit(0);
+                    SaveAndLoadJson.SaveGameAndWriteIDToGameSave(gameSave);
+                    var gameSaves = SaveAndLoadJson.LoadGames(out _);
+                    Menu startMenu = new LoadPlayerMenu(gameSaves, out gameSave);
+                    HandleInput(gameSave);
                     validInput = true;
                     break;
                 default:
@@ -68,8 +63,6 @@ class Programm
                     Console.ForegroundColor = ConsoleColor.White;
                     break;
             }
-            if (validInput)
-                break;
         }
     }
 }

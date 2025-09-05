@@ -2,12 +2,14 @@
 using Game.Combat;
 using Game.Items;
 using Game.Utilities;
+using Newtonsoft.Json;
 
 namespace Game.Charakters;
 
 public class Inventory
 {
     public List<ItemStack> Items { get; private set; } = [];
+    [JsonProperty]
     public int Gold { get; private set; } = 0; // TODO vielleicht später mal ulong falls 2 millarden nicht reichen xD
 
     public Inventory() { }

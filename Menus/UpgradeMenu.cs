@@ -13,50 +13,50 @@ class UpgradeMenu : Menu
         Console.ForegroundColor = ConsoleColor.White;
         Console.WriteLine("-------------");
     }
-    public UpgradeMenu(Player player)
+    public UpgradeMenu(GameSave gameSave)
     {
         Console.ForegroundColor = ConsoleColor.DarkYellow;
-        Console.WriteLine($"Gold: {player.Inventory.Gold}");
+        Console.WriteLine($"Gold: {gameSave.Player.Inventory.Gold}");
         Console.ForegroundColor = ConsoleColor.White;
         Console.WriteLine("------------");
         Console.WriteLine();
         Console.WriteLine();
 
-        Console.Write($"[1] Attack        + 1    (Aktueller Wert: {player.ShopBonusStats.BonusShopAttackStat}) \t");
+        Console.Write($"[1] Attack        + 1    (Aktueller Wert: {gameSave.Player.ShopBonusStats.BonusShopAttackStat}) \t");
         Console.ForegroundColor = ConsoleColor.DarkYellow;
         Console.WriteLine($"Preis: {Shop.Instance.Prices[BaseValue.Attack]} Gold!");
         Console.ForegroundColor = ConsoleColor.White;
 
-        Console.Write($"[2] Defense       + 1    (Aktueller Wert: {player.ShopBonusStats.BonusShopDefenseStat}) \t");
+        Console.Write($"[2] Defense       + 1    (Aktueller Wert: {gameSave.Player.ShopBonusStats.BonusShopDefenseStat}) \t");
         Console.ForegroundColor = ConsoleColor.DarkYellow;
         Console.WriteLine($"Preis: {Shop.Instance.Prices[BaseValue.Defense]} Gold!");
         Console.ForegroundColor = ConsoleColor.White;
 
-        Console.Write($"[3] Wisdom        + 0.1  (Aktueller Wert: {player.ShopBonusStats.BBonusShopWisdomStat}) \t");
+        Console.Write($"[3] Wisdom        + 0.1  (Aktueller Wert: {gameSave.Player.ShopBonusStats.BBonusShopWisdomStat}) \t");
         Console.ForegroundColor = ConsoleColor.DarkYellow;
         Console.WriteLine($"Preis: {Shop.Instance.Prices[BaseValue.Wisdom]} Gold!");
         Console.ForegroundColor = ConsoleColor.White;
 
-        Console.Write($"[4] Health        + 5    (Aktueller Wert: {player.ShopBonusStats.BonusShopHealthStat}) \t");
+        Console.Write($"[4] Health        + 5    (Aktueller Wert: {gameSave.Player.ShopBonusStats.BonusShopHealthStat}) \t");
         Console.ForegroundColor = ConsoleColor.DarkYellow;
         Console.WriteLine($"Preis: {Shop.Instance.Prices[BaseValue.Health]} Gold!");
         Console.ForegroundColor = ConsoleColor.White;
 
-        Console.Write($"[5] HealthPotion  + 5    (Aktueller Wert: {player.ShopBonusStats.BonusShopHealthPotionStat}) \t");
+        Console.Write($"[5] HealthPotion  + 5    (Aktueller Wert: {gameSave.Player.ShopBonusStats.BonusShopHealthPotionStat}) \t");
         Console.ForegroundColor = ConsoleColor.DarkYellow;
         Console.WriteLine($"Preis: {Shop.Instance.Prices[BaseValue.HealthPotion]} Gold!");
         Console.ForegroundColor = ConsoleColor.White;
 
-        Console.Write($"[6] PoisenPotion  + 1    (Aktueller Wert: {player.ShopBonusStats.BonusShopPoisonPotionStat}) \t");
+        Console.Write($"[6] PoisenPotion  + 1    (Aktueller Wert: {gameSave.Player.ShopBonusStats.BonusShopPoisonPotionStat}) \t");
         Console.ForegroundColor = ConsoleColor.DarkYellow;
         Console.WriteLine($"Preis: {Shop.Instance.Prices[BaseValue.PoisenPotion]} Gold!");
         Console.ForegroundColor = ConsoleColor.White;
 
         Console.WriteLine("[7] Zurück");
-        HandleInput(player);
+        HandleInput(gameSave);
     }
 
-    private void HandleInput(Player player)
+    private void HandleInput(GameSave gameSave)
     {
         string input;
         bool validInput = false;
@@ -67,45 +67,45 @@ class UpgradeMenu : Menu
             switch (input)
             {
                 case "1":
-                    player.UpgradeBaseValue(BaseValue.Attack);
-                    Menu nextMenu = new UpgradeMenu(player);
-                    Programm.HandleInput(player);
+                    gameSave.Player.UpgradeBaseValue(BaseValue.Attack);
+                    Menu nextMenu = new UpgradeMenu(gameSave);
+                    Programm.HandleInput(gameSave);
                     validInput = true;
                     break;
                 case "2":
-                    player.UpgradeBaseValue(BaseValue.Defense);
-                    nextMenu = new UpgradeMenu(player);
-                    Programm.HandleInput(player);
+                    gameSave.Player.UpgradeBaseValue(BaseValue.Defense);
+                    nextMenu = new UpgradeMenu(gameSave);
+                    Programm.HandleInput(gameSave);
                     validInput = true;
                     break;
                 case "3":
-                    player.UpgradeBaseValue(BaseValue.Wisdom);
-                    nextMenu = new UpgradeMenu(player);
-                    Programm.HandleInput(player);
+                    gameSave.Player.UpgradeBaseValue(BaseValue.Wisdom);
+                    nextMenu = new UpgradeMenu(gameSave);
+                    Programm.HandleInput(gameSave);
                     validInput = true;
                     break;
                 case "4":
-                    player.UpgradeBaseValue(BaseValue.Health);
-                    nextMenu = new UpgradeMenu(player);
-                    Programm.HandleInput(player);
+                    gameSave.Player.UpgradeBaseValue(BaseValue.Health);
+                    nextMenu = new UpgradeMenu(gameSave);
+                    Programm.HandleInput(gameSave);
                     validInput = true;
                     break;
                 case "5":
-                    player.UpgradeBaseValue(BaseValue.HealthPotion);
-                    nextMenu = new UpgradeMenu(player);
-                    Programm.HandleInput(player);
+                    gameSave.Player.UpgradeBaseValue(BaseValue.HealthPotion);
+                    nextMenu = new UpgradeMenu(gameSave);
+                    Programm.HandleInput(gameSave);
                     validInput = true;
                     break;
                 case "6":
-                    player.UpgradeBaseValue(BaseValue.PoisenPotion);
-                    nextMenu = new UpgradeMenu(player);
-                    Programm.HandleInput(player);
+                    gameSave.Player.UpgradeBaseValue(BaseValue.PoisenPotion);
+                    nextMenu = new UpgradeMenu(gameSave);
+                    Programm.HandleInput(gameSave);
                     validInput = true;
                     break;
                 case "7":
-                    SaveAndLoadJson.SaveGame(new GameSaves(player, new Fight(), Shop.Instance));
-                    nextMenu = new StartMenu(player);
-                    Programm.HandleInput(player);
+                    SaveAndLoadJson.SaveGameAndWriteIDToGameSave(gameSave);
+                    nextMenu = new StartMenu(gameSave);
+                    Programm.HandleInput(gameSave);
                     validInput = true;
                     break;
                 default:
