@@ -1,10 +1,9 @@
-﻿
-using Game.Combat;
+﻿using Game.Combat;
 using Game.Items;
 using Game.Utilities;
 using Newtonsoft.Json;
 
-namespace Game.Charakters;
+namespace Game.Enteties;
 
 public class Inventory
 {

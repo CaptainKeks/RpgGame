@@ -1,9 +1,9 @@
-﻿
+﻿using Game.Classes;
 using Game.Combat;
 using Game.Utilities;
 using Newtonsoft.Json;
 
-namespace Game.Charakters;
+namespace Game.Enteties;
 
 public abstract class Entity
 {
@@ -70,7 +70,7 @@ public abstract class Entity
 
     public virtual ActionHistoryEntry SpecialAttack(Entity defender)
     {
-        ActualDamage = (GetSpecialAttackValue() - defender.GetDefenseValue());
+        ActualDamage = GetSpecialAttackValue() - defender.GetDefenseValue();
         ActualDamage = defender.InDefensePosition ? ActualDamage / 2 : ActualDamage;
         ActualDamage = ActualDamage < 0 ? 0 : ActualDamage;
         defender.CurrentHealth -= ActualDamage;
@@ -107,7 +107,7 @@ public abstract class Entity
 
     public virtual double GetWisdomValue()
     {
-        return (BaseWisdom + ShopBonusStats.BBonusShopWisdomStat + Class.WisdomModifier);
+        return BaseWisdom + ShopBonusStats.BBonusShopWisdomStat + Class.WisdomModifier;
     }
 
     public virtual void UpgradeBaseValue(BaseValue baseValue)

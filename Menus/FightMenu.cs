@@ -1,20 +1,15 @@
 ﻿using Game.Charakters;
 using Game.Combat;
+using Game.Enteties;
 using Game.Helper;
-using Game.Items;
 using Game.Utilities;
+using Game.Classes;
 
 namespace Game.Menus;
 class FightMenu : Menu
 {
-    private FightValues fightValues = new FightValues();
     // Hier auch fight Property
     public override void DisplayMenu() { }
-
-    // Nur in Menus Console.WriteLine verwenden
-    // Kampfklasse erstellen mit nur logik ohne ConsoleWrite Line
-    // Logik Funktionen returnen nur werte nicht mehr
-    // Print funtionen in den Menu klassen nehmen die werte auf und printen sie raus
 
     private void DisplayEnteties(Entity player, Fight fight)
     {
@@ -101,7 +96,6 @@ class FightMenu : Menu
             PrintMenuRoundAndTurn(gameSave.Fight);
             PrintMenuPlayerMove(gameSave);
         }
-
 
         historyEntry = gameSave.Fight.PlayerMoveForRound(choice, gameSave);
         PrintHistoryEntry(historyEntry, gameSave.Fight);
@@ -266,25 +260,9 @@ class FightMenu : Menu
             Console.WriteLine($"[{i++}]{target.GetShortInfo()}");
     }
 
-    private int GetUserInputNumber()
-    {
-        int result = default;
-        Console.Write("> ");
-        string? input = Console.ReadLine();
-        while (!int.TryParse(input, out result))
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Gib eine Gültige Zahl ein.");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.Write("> ");
-            input = Console.ReadLine();
-        }
-        return result;
-    }
-
     private void DisplayAvailableOptions(AvailableOptions options)
     {
-        int i = 1;
+        int i = 0;
         foreach (var action in options.Actions)
         {
             Console.WriteLine($"[{i++}] " + action);

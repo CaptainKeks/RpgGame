@@ -1,4 +1,4 @@
-﻿namespace Game.Charakters;
+﻿namespace Game.Enteties;
 
 public class Stats
 {

@@ -1,4 +1,5 @@
-﻿using Game.Charakters;
+﻿using Game.Utilities;
+using static Programm;
 namespace Game.Menus;
 
 class StartMenu : Menu
@@ -11,7 +12,7 @@ class StartMenu : Menu
         Console.WriteLine("--------------------");
         Console.WriteLine();
     }
-    public StartMenu(GameSave gameSaves)
+    public StartMenu(GameSave gameSaves, List<LoadedSaveGameActionsEnum> actions)
     {
         Console.WriteLine("---------------------");
         Console.ForegroundColor = ConsoleColor.DarkYellow;
@@ -23,9 +24,11 @@ class StartMenu : Menu
         Console.ForegroundColor = ConsoleColor.White;
         Console.WriteLine("---------------------");
         Console.WriteLine();
-        Console.WriteLine("[1] Neuer Run");
-        Console.WriteLine("[2] Spiel Laden");
-        Console.WriteLine("[3] Upgrades");
-        Console.WriteLine("[4] Zurück");
+
+        int i = 0;
+        foreach (var action in actions)
+        {
+            Console.WriteLine($"[{i++}] {action.ToString().Replace('_', ' ')}");
+        }
     }
 }

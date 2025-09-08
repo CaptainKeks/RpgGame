@@ -1,5 +1,5 @@
-﻿using Game.Charakters;
-using Game.Combat;
+﻿using Game.Combat;
+using Game.Enteties;
 using System.Security.Cryptography.X509Certificates;
 
 namespace Game.Items;

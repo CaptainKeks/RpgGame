@@ -1,8 +1,7 @@
-﻿using Game.Charakters;
-using Game.Combat;
-using Game.Utilities;
+﻿using Game.Combat;
+using Game.Enteties;
 
-namespace Game;
+namespace Game.Utilities;
 
 public class GameSave
 {

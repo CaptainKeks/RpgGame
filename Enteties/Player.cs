@@ -1,7 +1,9 @@
-﻿using Game.Items;
+﻿using Game.Charakters;
+using Game.Classes;
+using Game.Items;
 using Newtonsoft.Json;
 
-namespace Game.Charakters;
+namespace Game.Enteties;
 
 public enum BaseValue
 {

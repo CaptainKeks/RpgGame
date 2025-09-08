@@ -1,8 +1,8 @@
-﻿using Game.Charakters;
-using Game.Menus;
+﻿using Game.Combat;
+using Game.Enteties;
 using System.Runtime.CompilerServices;
 
-namespace Game.Combat;
+namespace Game.Menus;
 class UseItemMenu : Menu
 {
     public override void DisplayMenu()
@@ -21,11 +21,11 @@ class UseItemMenu : Menu
         Console.WriteLine($"[{content.Length}] zurück zum Kampf");
         // historyEntry = HandleInput(player, out noItemUsed);
         int input = GetUserInputNumber();
-        choice = HandleInput(content, player, input, out noItemUsed);
+        choice = CreateUseItemPlayerChoiceFromUserInput(content, player, input, out noItemUsed);
     }
 
 
-    private PlayerChoice HandleInput(Inventory.ViewItem[] content, Entity player, int input, out bool noItemUsed)
+    private PlayerChoice CreateUseItemPlayerChoiceFromUserInput(Inventory.ViewItem[] content, Entity player, int input, out bool noItemUsed)
     {
         PlayerChoice choice = null;
         noItemUsed = false;
@@ -51,7 +51,7 @@ class UseItemMenu : Menu
                 Console.WriteLine("Falscher Input");
                 Console.ForegroundColor = ConsoleColor.White;
                 input = GetUserInputNumber();
-                choice = HandleInput(content, player, input, out noItemUsed);
+                choice = CreateUseItemPlayerChoiceFromUserInput(content, player, input, out noItemUsed);
                 return choice;
             }
         }

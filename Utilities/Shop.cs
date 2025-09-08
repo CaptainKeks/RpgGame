@@ -1,4 +1,4 @@
-﻿using Game.Charakters;
+﻿using Game.Enteties;
 using Newtonsoft.Json;
 
 namespace Game.Utilities;
@@ -28,6 +28,9 @@ public class Shop
         _instance = newShop ?? _instance;
     }
 
+    /// <summary>
+    /// Erstellt eine neue Instanz von Shop.
+    /// </summary>
     public static void CreateNewShop()
     {
         _instance = new Shop();

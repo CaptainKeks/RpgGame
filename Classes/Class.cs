@@ -1,6 +1,7 @@
-﻿using Game.Items;
+﻿using Game.Enteties;
+using Game.Items;
 
-namespace Game.Charakters;
+namespace Game.Classes;
 
 public abstract class Class
 {

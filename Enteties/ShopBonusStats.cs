@@ -3,7 +3,7 @@
 using System.ComponentModel.DataAnnotations;
 using Game.Utilities;
 
-namespace Game.Charakters;
+namespace Game.Enteties;
 
 public class ShopBonusStats
 {

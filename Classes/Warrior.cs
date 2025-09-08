@@ -1,8 +1,7 @@
-﻿
-
+﻿using Game.Enteties;
 using Game.Items;
 
-namespace Game.Charakters;
+namespace Game.Classes;
 
 class Warrior : Class
 {

@@ -1,6 +1,6 @@
-﻿
-using Game.Charakters;
-
+﻿using Game.Combat;
+using Game.Utilities;
+using static Programm;
 namespace Game.Menus;
 
 public class LoadPlayerMenu : Menu
@@ -22,10 +22,15 @@ public class LoadPlayerMenu : Menu
     {
         PrintAvailableSaves(gameSaves);
         var input = GetUserInputNumber();
-        HandleInput(input, gameSaves, out gameSave);
+        DisplayCharakterOrStartMenu(input, gameSaves, out gameSave);
     }
 
-    private void HandleInput(int input, List<GameSave> gameSaves, out GameSave gameSave)
+    private List<LoadedSaveGameActionsEnum> GetLoadedSaveGameActions()
+    {
+        return Enum.GetValues<LoadedSaveGameActionsEnum>().Cast<LoadedSaveGameActionsEnum>().ToList();
+    }
+
+    private void DisplayCharakterOrStartMenu(int input, List<GameSave> gameSaves, out GameSave gameSave)
     {
         gameSave = new GameSave();
         if (input == 0)
@@ -35,7 +40,7 @@ public class LoadPlayerMenu : Menu
         else if (gameSaves.Count + 1 > input)
         {
             gameSave = gameSaves[input - 1];
-            Menu nextMenu = new StartMenu(gameSaves[input - 1]);
+            Menu nextMenu = new StartMenu(gameSaves[input - 1], GetLoadedSaveGameActions());
         }
         else if (gameSaves.Count + 1 == input)
         {
@@ -47,7 +52,7 @@ public class LoadPlayerMenu : Menu
             Console.WriteLine("Falscher Input");
             Console.ForegroundColor = ConsoleColor.White;
             input = GetUserInputNumber();
-            HandleInput(input, gameSaves, out gameSave);
+            DisplayCharakterOrStartMenu(input, gameSaves, out gameSave);
         }
     }
 
@@ -70,24 +75,7 @@ public class LoadPlayerMenu : Menu
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine($"{gameSaves[i].Player.Class.ClassName}");
             Console.ForegroundColor = ConsoleColor.White;
-
         }
         Console.WriteLine($"[{gameSaves.Count + 1}] Beenden");
-    }
-
-    private int GetUserInputNumber()
-    {
-        int result = default;
-        Console.Write("> ");
-        string? input = Console.ReadLine();
-        while (!int.TryParse(input, out result))
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Gib eine Gültige Zahl ein.");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.Write("> ");
-            input = Console.ReadLine();
-        }
-        return result;
     }
 }

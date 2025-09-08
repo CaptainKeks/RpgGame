@@ -1,5 +1,6 @@
 ﻿
 using Game.Charakters;
+using Game.Enteties;
 using Game.Helper;
 using Game.Items;
 using Game.Menus;
@@ -240,16 +241,16 @@ public record PlayerChoice(ActivePlayerActionEnum Action, Entity Initiator, List
 
 public enum ActivePlayerActionEnum
 {
-    Attack = 1,
-    SpecialAttack = 2,
-    Defend = 3,
-    UseItem = 4,
-    Flee = 5
+    Attack,
+    SpecialAttack,
+    Defend,
+    UseItem,
+    Flee
 }
 
 public enum PassiveActionEnum
 {
-    ApplyStatusEffect = 0
+    ApplyStatusEffect
 }
 
 /// <summary>

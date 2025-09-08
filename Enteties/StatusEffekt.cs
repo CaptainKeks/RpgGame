@@ -1,7 +1,6 @@
-﻿
-using Game.Combat;
+﻿using Game.Combat;
 
-namespace Game.Charakters;
+namespace Game.Enteties;
 
 public class StatusEffekt
 {

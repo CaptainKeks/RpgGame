@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Game.Charakters.EnemyGenerator" Collapsed="true">
+    <Position X="2.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Charakters\EnemyGenerator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Game.Items.GiftTrank" Collapsed="true">
+    <Position X="8" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAAiAAAAAAAAAAQAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>Items\GiftTrank.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Game.Items.HeilTrank" Collapsed="true">
+    <Position X="10.25" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAAiAAAAAAAAAAQAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>Items\HeilTrank.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Game.Items.Item" Collapsed="true">
+    <Position X="9.25" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAAiAAAAAAAAAAQAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>Items\Item.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Game.Menus.FinishMenus.LoosingMenu" Collapsed="true">
+    <Position X="7.75" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAA=</HashCode>
+      <FileName>Menus\FinishMenus\LoosingMenu.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Game.Menus.FinishMenus.WinnerMenu" Collapsed="true">
+    <Position X="14.5" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAA=</HashCode>
+      <FileName>Menus\FinishMenus\WinnerMenu.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Game.Menus.CharakterMenu" Collapsed="true">
+    <Position X="21.25" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAA=</HashCode>
+      <FileName>Menus\CharakterMenu.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Game.Menus.FightMenu" Collapsed="true">
+    <Position X="10" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAIAAAAAAAAAAAQAAEQAAACAAAAAAAAgACgQQAAAJEA=</HashCode>
+      <FileName>Menus\FightMenu.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Game.Menus.LoadPlayerMenu" Collapsed="true">
+    <Position X="16.75" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAAAAAAAAAAAAAAAAAAAAgAAAAAAQQAAAAAA=</HashCode>
+      <FileName>Menus\LoadPlayerMenu.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Game.Menus.Menu" Collapsed="true">
+    <Position X="14.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAA=</HashCode>
+      <FileName>Menus\Menu.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Game.Menus.StartMenu" Collapsed="true">
+    <Position X="12.25" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAA=</HashCode>
+      <FileName>Menus\StartMenu.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Game.Menus.UpgradeMenu" Collapsed="true">
+    <Position X="19" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAA=</HashCode>
+      <FileName>Menus\UpgradeMenu.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Game.Helper.SaveAndLoadJson" Collapsed="true">
+    <Position X="2.5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAACAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>Services\SaveAndLoadJson.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Game.Utilities.Shop" Collapsed="true">
+    <Position X="0.5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAQAAAACAAAAAAAAAAAAAAAEAQAAAAAAAAAA=</HashCode>
+      <FileName>Utilities\Shop.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

@@ -1,5 +1,7 @@
 ﻿
+using Game.Classes;
 using Game.Combat;
+using Game.Enteties;
 using Game.Items;
 
 namespace Game.Charakters;

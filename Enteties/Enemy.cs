@@ -1,17 +1,19 @@
-﻿using Game.Combat;
+﻿using Game.Charakters;
+using Game.Classes;
+using Game.Combat;
 using Game.Items;
 using Newtonsoft.Json;
 
-namespace Game.Charakters;
+namespace Game.Enteties;
 
 public class Enemy : Entity
 {
     public Enemy(Class @class, int level = 1) : base(@class)
     {
         Random rnd = new Random();
-        MaxHealth = (GetMaxHealthValue() - 8) + (4 * level);
+        MaxHealth = GetMaxHealthValue() - 8 + 4 * level;
         CurrentHealth = MaxHealth;
-        Class.AttackModifier = rnd.Next((int)(Class.AttackModifier + (level * 1.5) - 2), (int)(Class.AttackModifier + (level * 1.5) + 2));
+        Class.AttackModifier = rnd.Next((int)(Class.AttackModifier + level * 1.5 - 2), (int)(Class.AttackModifier + level * 1.5 + 2));
         Inventory.AddItem(new GiftTrank("GiftTrank", 5, 2));
     }
 
