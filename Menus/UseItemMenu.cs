@@ -1,13 +1,14 @@
 ﻿using Game.Combat;
 using Game.Enteties;
-using System.Runtime.CompilerServices;
 
 namespace Game.Menus;
 class UseItemMenu : Menu
 {
     public override void DisplayMenu()
     {
+        Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine("Inventar: ");
+        Console.ForegroundColor = ConsoleColor.White;
         Console.WriteLine("----------");
         Console.WriteLine();
         Console.WriteLine("wähle ein Item aus:");

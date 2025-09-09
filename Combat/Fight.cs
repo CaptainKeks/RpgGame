@@ -1,8 +1,6 @@
-﻿
-using Game.Charakters;
+﻿using Game.Charakters;
 using Game.Enteties;
 using Game.Helper;
-using Game.Items;
 using Game.Menus;
 using Game.Menus.FinishMenus;
 using Game.Utilities;
@@ -39,9 +37,7 @@ public class Fight
 
     public AvailableOptions GetAvailableOptions()
     {
-        List<ActivePlayerActionEnum> playerActionEnums = Enum.GetValues<ActivePlayerActionEnum>()
-                                                       .Cast<ActivePlayerActionEnum>().ToList();
-
+        List<ActivePlayerActionEnum> playerActionEnums = Enum.GetValues<ActivePlayerActionEnum>().Cast<ActivePlayerActionEnum>().ToList();
         return new AvailableOptions(Player, playerActionEnums);
     }
 
@@ -73,7 +69,7 @@ public class Fight
     /// </summary>
     /// <param name="decision"></param>
     /// <returns></returns>
-    public ActionHistoryEntry PlayerMoveForRound(PlayerChoice decision, GameSave gameSave)
+    public ActionHistoryEntry PlayerMove(PlayerChoice decision, GameSave gameSave)
     {
         if (decision == null)
             return null;
@@ -107,7 +103,7 @@ public class Fight
     /// Führt eine Aktion aus die durch Zufall generiert wird. Und zählt die Runde eins höher
     /// </summary>
     /// <returns></returns>
-    public List<ActionHistoryEntry> EnemyMoveForRound(GameSave gameSave)
+    public List<ActionHistoryEntry> EnemyMove(GameSave gameSave)
     {
         List<ActionHistoryEntry> list = new List<ActionHistoryEntry>();
         ActionHistoryEntry historyEntry = null;
@@ -119,7 +115,8 @@ public class Fight
             var rnd = new Random();
             if (enemy.Inventory.Items.Count > 0)
                 enemyMove = rnd.Next(1, 5);
-            enemyMove = rnd.Next(1, 4);
+            else
+                enemyMove = rnd.Next(1, 4);
 
             switch (enemyMove)
             {
@@ -139,7 +136,8 @@ public class Fight
                     continue;
 
                 case 4:
-                    historyEntry = enemy.Inventory.UseItem(null, enemy, Player);
+                    var items = enemy.Inventory.GetInventoryContents();
+                    historyEntry = enemy.Inventory.UseItem(items[0], enemy, Player);
                     list.Add(historyEntry);
                     continue;
             }
@@ -248,11 +246,6 @@ public enum ActivePlayerActionEnum
     Flee
 }
 
-public enum PassiveActionEnum
-{
-    ApplyStatusEffect
-}
-
 /// <summary>
 /// Speichert die Möglichen Aktionen für einen Spieler
 /// </summary>
@@ -270,5 +263,5 @@ public record AvailableOptions(Player Player, List<ActivePlayerActionEnum> Actio
 /// <param name="Item"></param>
 /// <param name="StatusEffektDuration"></param>
 /// <param name="StatusEffektValue"></param>
-public record ActionHistoryEntry(ActivePlayerActionEnum? ActiveAction, Entity? Initiator, List<Entity> Target, Inventory.ViewItem? Item = null, int StatusEffektDuration = 0, double StatusEffektValue = 0, bool noItemUsed = false, double healed = 0);
-
+public record ActionHistoryEntry(ActivePlayerActionEnum? ActiveAction, Entity? Initiator, List<Entity> Target, Inventory.ViewItem? Item = null, int StatusEffektDuration = 0,
+                                 double StatusEffektValue = 0, bool noItemUsed = false, double healed = 0);

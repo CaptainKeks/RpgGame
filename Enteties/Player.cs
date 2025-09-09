@@ -1,5 +1,4 @@
-﻿using Game.Charakters;
-using Game.Classes;
+﻿using Game.Classes;
 using Game.Items;
 using Newtonsoft.Json;
 
@@ -17,16 +16,18 @@ public enum BaseValue
 
 public class Player : Entity
 {
-    public Player(Class @class) : base(@class)
+    public Player(Class @class, string name) : base(@class)
     {
-        Inventory.AddItems([new HeilTrank("HeilTrank", 30), new GiftTrank("GiftTrank", 5, 3)]);
+        if (@class is Mage)
+            Inventory.AddItems([new HeilTrank("HeilTrank", GetHealthPotionValue()), new GiftTrank("GiftTrank", GetPoisonPotionValue(), 3)]);
+        if (@class is Warrior)
+            Inventory.AddItems([new HeilTrank("HeilTrank", GetHealthPotionValue())]);
+        Name = name;
     }
-    public Player()
-    {
-    }
+    public Player() { }
 
     [JsonProperty]
-    public override string Name { get; protected set; } = "Aria";
+    public override string Name { get; set; } = "Aria";
     [JsonProperty]
     public override double BaseAttack { get; protected set; } = 4;
     [JsonProperty]
@@ -34,7 +35,7 @@ public class Player : Entity
     [JsonProperty]
     public override double BaseWisdom { get; protected set; } = 0;
     [JsonProperty]
-    public override double MaxHealth { get; protected set; } = 30;
+    public override double MaxHealth { get; set; } = 30;
     [JsonProperty]
     public override double BaseHealth { get; protected set; } = 30;
 }

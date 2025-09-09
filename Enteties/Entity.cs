@@ -8,7 +8,7 @@ namespace Game.Enteties;
 public abstract class Entity
 {
     [JsonProperty]
-    public virtual string Name { get; protected set; }
+    public virtual string Name { get; set; }
     [JsonProperty]
     public virtual double BaseAttack { get; protected set; }
     [JsonProperty]
@@ -18,28 +18,27 @@ public abstract class Entity
     [JsonProperty]
     public virtual double BaseHealth { get; protected set; }
     [JsonProperty]
+    public virtual double BaseHealthPotionValue { get; protected set; } = 30;
+    [JsonProperty]
+    public virtual double BasePoisonPotionValue { get; protected set; } = 5;
+    [JsonProperty]
     public virtual double CurrentHealth { get; set; }
     [JsonProperty]
     public virtual double ActualDamage { get; set; }
     [JsonProperty]
-    public virtual double MaxHealth { get; protected set; }
+    public virtual double MaxHealth { get; set; }
     [JsonProperty]
     public virtual bool InDefensePosition { get; set; } = false;
     [JsonProperty]
-    public virtual Class Class { get; protected set; }
+    public virtual Class Class { get; set; }
     [JsonProperty]
     public virtual Inventory Inventory { get; protected set; } = new();
     [JsonProperty]
     public virtual List<StatusEffekt> StatusEffekts { get; set; } = [];
     [JsonProperty]
-    public virtual ShopBonusStats ShopBonusStats { get; protected set; } = new(0, 0, 0, 0, 0, 0);
+    public virtual UpgradedStatsFromShop ShopBonusStats { get; protected set; } = new(0, 0, 0, 0, 0, 0);
     [JsonProperty]
     public virtual Stats Stats { get; protected set; } = new(0, 0);
-
-
-    // Eine Klasse erstellen für GameSaves wo alle gespeicherten werte drin sind 
-    // die klasse hat methoden die die werte in Player enemie usw in den konstruktor übergeben und diese dann setzen
-    // geänderte werte die sich nicht berechenn lassen muss ich synchronisieren
 
     public Entity(Class @class)
     {
@@ -50,11 +49,6 @@ public abstract class Entity
     }
 
     public Entity() { }
-
-    public void ApplyShopBonusStats(ShopBonusStats shopBonusStats)
-    {
-        ShopBonusStats = shopBonusStats;
-    }
 
 
     public virtual ActionHistoryEntry Attack(Entity defender)
@@ -107,8 +101,18 @@ public abstract class Entity
 
     public virtual double GetWisdomValue()
     {
-        return BaseWisdom + ShopBonusStats.BBonusShopWisdomStat + Class.WisdomModifier;
+        return BaseWisdom + ShopBonusStats.BonusShopWisdomStat + Class.WisdomModifier;
     }
+
+    public virtual double GetHealthPotionValue()
+    {
+        return BaseHealthPotionValue + ShopBonusStats.BonusShopHealthPotionStat;
+    }
+    public virtual double GetPoisonPotionValue()
+    {
+        return BasePoisonPotionValue + ShopBonusStats.BonusShopPoisonPotionStat;
+    }
+
 
     public virtual void UpgradeBaseValue(BaseValue baseValue)
     {
@@ -125,40 +129,43 @@ public abstract class Entity
         switch (baseValue)
         {
             case BaseValue.Attack:
-                UpgradeBaseValues(ShopBonusStats, m => m.BonusShopAttackStat, (m, v) => m.BonusShopAttackStat = v, "Attack", 1, BaseValue.Attack);
-                Console.ReadKey();
+                ShopBonusStats.UpgradeShopBonusStats(new Shop.ShopValueUpgrade(baseValue, 1));
+                ChangePrice(baseValue);
                 break;
             case BaseValue.Defense:
-                UpgradeBaseValues(ShopBonusStats, m => m.BonusShopDefenseStat, (m, v) => m.BonusShopDefenseStat = v, "Defense", 1, BaseValue.Defense);
-                Console.ReadKey();
+                ShopBonusStats.UpgradeShopBonusStats(new Shop.ShopValueUpgrade(baseValue, 1));
+                ChangePrice(baseValue);
                 break;
+
             case BaseValue.Wisdom:
-                UpgradeBaseValues(ShopBonusStats, m => m.BBonusShopWisdomStat, (m, v) => m.BBonusShopWisdomStat = v, "Wisdom", 1, BaseValue.Wisdom);
-                Console.ReadKey();
+                ShopBonusStats.UpgradeShopBonusStats(new Shop.ShopValueUpgrade(baseValue, 1));
+                ChangePrice(baseValue);
                 break;
+
             case BaseValue.Health:
-                UpgradeBaseValues(ShopBonusStats, m => m.BonusShopHealthStat, (m, v) => m.BonusShopHealthStat = v, "Health", 5, BaseValue.Health);
+                ShopBonusStats.UpgradeShopBonusStats(new Shop.ShopValueUpgrade(baseValue, 5));
+                ChangePrice(baseValue);
                 break;
+
             case BaseValue.HealthPotion:
-                UpgradeBaseValues(ShopBonusStats, m => m.BonusShopHealthPotionStat, (m, v) => m.BonusShopHealthPotionStat = v, "HealthPotion", 5, BaseValue.HealthPotion);
+                ShopBonusStats.UpgradeShopBonusStats(new Shop.ShopValueUpgrade(baseValue, 5));
+                ChangePrice(baseValue);
                 break;
+
             case BaseValue.PoisenPotion:
-                UpgradeBaseValues(ShopBonusStats, m => m.BonusShopPoisonPotionStat, (m, v) => m.BonusShopPoisonPotionStat = v, "PoisonPotion", 1, BaseValue.PoisenPotion);
+                ShopBonusStats.UpgradeShopBonusStats(new Shop.ShopValueUpgrade(baseValue, 1));
+                ChangePrice(baseValue);
                 break;
+
             default:
                 break;
         }
     }
 
-    private void UpgradeBaseValues(ShopBonusStats bonusStats, Func<ShopBonusStats, double> getter, Action<ShopBonusStats, double> setter, string label, int increment, BaseValue baseValue)
+    private void ChangePrice(BaseValue baseValue)
     {
-        var current = getter(bonusStats);
-        setter(bonusStats, current + increment);
-        Inventory.RemoveGold(Shop.Instance.Prices[baseValue], out bool failed);
+        Inventory.RemoveGold(Shop.Instance.Prices[baseValue], out _);
         Inventory.HigherPrice(baseValue, 15);
-        Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine($"Deine {label} wurde auf {getter(bonusStats)} erhöht.");
-        Console.ForegroundColor = ConsoleColor.White;
     }
 
     public virtual string GetShortInfo()

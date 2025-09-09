@@ -1,6 +1,4 @@
-﻿using Game.Charakters;
-using Game.Classes;
-using Game.Combat;
+﻿using Game.Classes;
 using Game.Items;
 using Newtonsoft.Json;
 
@@ -18,7 +16,7 @@ public class Enemy : Entity
     }
 
     [JsonProperty]
-    public override string Name { get; protected set; } = "Orga";
+    public override string Name { get; set; } = "Orga";
     [JsonProperty]
     public override double BaseAttack { get; protected set; } = 4;
     [JsonProperty]
@@ -26,7 +24,7 @@ public class Enemy : Entity
     [JsonProperty]
     public override double BaseWisdom { get; protected set; } = 0;
     [JsonProperty]
-    public override double MaxHealth { get; protected set; } = 25;
+    public override double MaxHealth { get; set; } = 25;
     [JsonProperty]
     public override double BaseHealth { get; protected set; } = 25;
 

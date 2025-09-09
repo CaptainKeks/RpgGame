@@ -1,5 +1,4 @@
-﻿
-namespace Game.Menus.FinishMenus;
+﻿namespace Game.Menus.FinishMenus;
 
 class WinnerMenu : Menu
 {

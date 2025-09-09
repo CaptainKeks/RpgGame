@@ -1,11 +1,8 @@
-﻿
-using Game.Charakters;
-using Game.Combat;
-using Game.Enteties;
+﻿using Game.Enteties;
 
 namespace Game.Items;
 
-class GiftTrank : Item
+public class GiftTrank : Item
 {
     public GiftTrank(string name, double value, int? duration = 0) : base(name, value)
     {
@@ -13,8 +10,8 @@ class GiftTrank : Item
     }
 
     public override int Duration { get; set; } = 3;
-    public override string Name { get; set; }
-    public override string Description => $"Ein Grün Blubberndes Getränk das 5 Leben pro Runde schaden macht für {Duration} Runden.";
+    public override string Name { get; set; } = "GiftTrank";
+    public override string Description => $"Ein Grün Blubberndes Getränk das {Value} Leben pro Runde schaden macht für {Duration} Runden.";
     public override double Value { get; set; } = 5;
 
     public override void UseItem(Entity initiator, Entity target, out bool noItemUsed, out double healed)
@@ -24,7 +21,7 @@ class GiftTrank : Item
         if (target.StatusEffekts.Count < 1)
         {
             noItemUsed = false;
-            target.StatusEffekts.Add(new StatusEffekt("Gift", "Fügt jede Runde dem Gegner 5 Schaden zu kann gestäckt werden.", Duration, Value));
+            target.StatusEffekts.Add(new StatusEffekt("Gift", $"Fügt jede Runde dem Gegner {Value} Schaden zu kann gestäckt werden.", Duration, Value));
         }
         else
         {

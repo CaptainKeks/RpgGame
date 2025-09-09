@@ -12,7 +12,7 @@ class StartMenu : Menu
         Console.WriteLine("--------------------");
         Console.WriteLine();
     }
-    public StartMenu(GameSave gameSaves, List<LoadedSaveGameActionsEnum> actions)
+    public StartMenu(GameSave gameSaves, List<GameActionsEnum> actions)
     {
         Console.WriteLine("---------------------");
         Console.ForegroundColor = ConsoleColor.DarkYellow;

@@ -15,24 +15,30 @@ class CharakterMenu : Menu
         Console.ForegroundColor = ConsoleColor.White;
         Console.WriteLine("--------------------");
         Console.WriteLine();
-        Console.WriteLine("Name: Aria");
+    }
+
+    public CharakterMenu(GameSave gameSave)
+    {
+        PrintCharakterInfos(gameSave);
+        int input = GetUserInputNumber();
+        CreateNewPlayerFromInput(gameSave, input);
+    }
+
+    private void PrintCharakterInfos(GameSave gameSave)
+    {
+        Console.WriteLine($"Name: {gameSave.Player.Name}");
         Console.WriteLine("Klasse Wählen:");
         Console.WriteLine();
         Console.ForegroundColor = ConsoleColor.DarkRed;
         Console.WriteLine("[0] Warrior  HP: Hoch, Blocken, Waffe: Schwert");
         Console.ForegroundColor = ConsoleColor.DarkCyan;
-        Console.WriteLine("[1] Mage     HP: Mittel, Waffe: Feuerball, Ressource: Mana");
+        Console.WriteLine("[1] Mage     HP: Mittel, Waffe: Magie");
         Console.ForegroundColor = ConsoleColor.White;
-    }
-
-    public CharakterMenu(GameSave gameSave)
-    {
-        int input = GetUserInputNumber();
-        CreateNewPlayerFromInput(gameSave, input);
     }
 
     private void CreateNewPlayerFromInput(GameSave gameSave, int input)
     {
+        var name = gameSave.Player.Name;
         Menu nextMenu;
         gameSave.Fight = new Fight();
         Random rnd = new Random();
@@ -41,13 +47,13 @@ class CharakterMenu : Menu
         {
             case 0:
                 Shop.CreateNewShop();
-                gameSave.Player = new Player(new Warrior());
+                gameSave.Player = new Player(new Warrior(), name);
                 gameSave.Fight = new Fight(gameSave.Player, new EnemyGenerator(new Ork(), rnd.Next(1, 4), gameSave.Fight));
                 nextMenu = new FightMenu(gameSave);
                 break;
             case 1:
                 Shop.CreateNewShop();
-                gameSave.Player = new Player(new Mage());
+                gameSave.Player = new Player(new Mage(), name);
                 gameSave.Fight = new Fight(gameSave.Player, new EnemyGenerator((new Ork()), rnd.Next(1, 4), gameSave.Fight));
                 nextMenu = new FightMenu(gameSave);
                 break;

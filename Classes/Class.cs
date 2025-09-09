@@ -1,6 +1,4 @@
 ﻿using Game.Enteties;
-using Game.Items;
-
 namespace Game.Classes;
 
 public abstract class Class
@@ -12,8 +10,5 @@ public abstract class Class
     public abstract double DefenceModifier { get; set; }
     public abstract double SpecialAttackModifier { get; set; }
     public abstract Inventory BaseInventory { get; set; } // BaseInventory
-    public Class()
-    {
-
-    }
+    public Class() { }
 }

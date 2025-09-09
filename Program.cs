@@ -7,7 +7,7 @@ using Game.Classes;
 
 public class Programm
 {
-    public enum LoadedSaveGameActionsEnum
+    public enum GameActionsEnum
     {
         Neuer_Run,
         Run_Laden,
@@ -27,21 +27,24 @@ public class Programm
         Random rnd = new Random();
         bool validInput = false;
         var userInput = GetUserInputNumber();
-        var action = (LoadedSaveGameActionsEnum)userInput;
+        var action = (GameActionsEnum)userInput;
         switch (action)
         {
-            case LoadedSaveGameActionsEnum.Neuer_Run:
+            case GameActionsEnum.Neuer_Run:
                 // Neuen Run erstellen
                 validInput = true;
+                LoadPlayerMenu.ReloadUpgradedStats([gameSave]);
+                gameSave.Player.CurrentHealth = gameSave.Player.MaxHealth;
                 gameSave.Fight = new Fight(gameSave.Player, new EnemyGenerator(new Ork(), rnd.Next(1, 4), gameSave.Fight));
                 Menu nextMenu = new FightMenu(gameSave);
                 break;
-            case LoadedSaveGameActionsEnum.Run_Laden:
+            case GameActionsEnum.Run_Laden:
                 // Spiel Laden
+                LoadPlayerMenu.ReloadUpgradedStats([gameSave]);
                 nextMenu = new FightMenu(gameSave);
                 validInput = true;
                 break;
-            case LoadedSaveGameActionsEnum.Upgrades:
+            case GameActionsEnum.Upgrades:
                 // Upgrade durchführen
                 if (gameSave.Player != null)
                 {
@@ -56,7 +59,7 @@ public class Programm
                     validInput = false;
                 }
                 break;
-            case LoadedSaveGameActionsEnum.Zurück:
+            case GameActionsEnum.Zurück:
                 SaveAndLoadJson.SaveGameAndWriteIDToGameSave(gameSave);
                 var gameSaves = SaveAndLoadJson.LoadGamesAndCreateFolder(out _);
                 Menu startMenu = new LoadPlayerMenu(gameSaves, out gameSave);

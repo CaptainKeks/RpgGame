@@ -10,7 +10,6 @@ static class SaveAndLoadJson
         TypeNameHandling = TypeNameHandling.All,
         Formatting = Formatting.Indented,
         ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor
-        // die settings anpassen
     };
 
     public static void DeleteGameSaveFile(GameSave gameSave)

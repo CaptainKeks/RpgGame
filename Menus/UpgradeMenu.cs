@@ -33,7 +33,7 @@ class UpgradeMenu : Menu
         Console.WriteLine($"Preis: {Shop.Instance.Prices[BaseValue.Defense]} Gold!");
         Console.ForegroundColor = ConsoleColor.White;
 
-        Console.Write($"[2] Wisdom        + 0.1  (Aktueller Wert: {gameSave.Player.ShopBonusStats.BBonusShopWisdomStat}) \t");
+        Console.Write($"[2] Wisdom        + 0.1  (Aktueller Wert: {gameSave.Player.ShopBonusStats.BonusShopWisdomStat}) \t");
         Console.ForegroundColor = ConsoleColor.DarkYellow;
         Console.WriteLine($"Preis: {Shop.Instance.Prices[BaseValue.Wisdom]} Gold!");
         Console.ForegroundColor = ConsoleColor.White;
@@ -58,13 +58,14 @@ class UpgradeMenu : Menu
         UpgradeBaseValueFromUserInput(gameSave, input);
     }
 
-    private List<LoadedSaveGameActionsEnum> GetLoadedSaveGameActions()
+    private List<GameActionsEnum> GetLoadedSaveGameActions()
     {
-        return Enum.GetValues<LoadedSaveGameActionsEnum>().Cast<LoadedSaveGameActionsEnum>().ToList();
+        return Enum.GetValues<GameActionsEnum>().Cast<GameActionsEnum>().ToList();
     }
 
     private void UpgradeBaseValueFromUserInput(GameSave gameSave, int input)
     {
+        UpgradedStatsFromShop bonusStats = new UpgradedStatsFromShop(0, 0, 0, 0, 0, 0);
         switch (input)
         {
             case 0:

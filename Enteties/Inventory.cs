@@ -14,11 +14,6 @@ public class Inventory
     public Inventory() { }
 
 
-    public void AddLoot(Enemy enemy)
-    {
-        throw new NotImplementedException();
-    }
-
     /// <summary>
     /// Addiert Gold zum Inventar Hinzu.
     /// </summary>
@@ -54,7 +49,6 @@ public class Inventory
         Shop.Instance.Prices[baseValue] += amount;
     }
 
-
     public void AddItem(Item item, int count = 1)
     {
         var stack = Items.FirstOrDefault(s => string.Equals(s.Item.Name, item.Name, StringComparison.OrdinalIgnoreCase));
@@ -85,9 +79,6 @@ public class Inventory
             }
         }
     }
-
-    // returns: welche Items kannst du haben / verwenden als spieler ohne das Item "seblst" anwenden zu können
-    // Items sollte nur über Inventar verwendet werden können
 
     public ViewItem[] GetInventoryContents()
     {
@@ -138,6 +129,5 @@ public class Inventory
         {
             Count = amount;
         }
-
     };
 }

@@ -7,8 +7,8 @@ namespace Game.Items
     {
         public HeilTrank(string name, double value) : base(name, value) { }
 
-        public override string Name { get; set; } = "Heiltrank";
-        public override string Description => "Ein Rotes Blubberndes Getränk das 30 Leben wiederherstellt.";
+        public override string Name { get; set; } = "HeilTrank";
+        public override string Description => $"Ein Rotes Blubberndes Getränk das {Value} Leben wiederherstellt.";
         public override double Value { get; set; } = 30;
         public override int Duration { get; set; }
 

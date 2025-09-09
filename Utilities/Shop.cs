@@ -1,5 +1,4 @@
 ﻿using Game.Enteties;
-using Newtonsoft.Json;
 
 namespace Game.Utilities;
 
@@ -31,9 +30,10 @@ public class Shop
     /// <summary>
     /// Erstellt eine neue Instanz von Shop.
     /// </summary>
-    public static void CreateNewShop()
+    public static Shop CreateNewShop()
     {
         _instance = new Shop();
+        return _instance;
     }
 
     public Dictionary<BaseValue, int> Prices { get; set; } = new Dictionary<BaseValue, int>();

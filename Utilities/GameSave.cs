@@ -11,11 +11,12 @@ public class GameSave
         Fight = fight;
         Shop = shop;
     }
+
     public GameSave() { }
 
 
     public Player Player { get; set; } = new Player();
     public Fight Fight { get; set; } = new Fight();
-    public Shop Shop { get; set; } = Shop.Instance;
+    public Shop Shop { get; set; } = Shop.CreateNewShop();
     public Guid ID { get; set; } = Guid.Empty;
 }

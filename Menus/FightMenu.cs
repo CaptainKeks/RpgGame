@@ -19,10 +19,10 @@ class FightMenu : Menu
         Console.ForegroundColor = ConsoleColor.White;
         Console.WriteLine("--------------");
         Console.WriteLine();
-        Console.WriteLine($"Spieler: {player.Name} ({player.Class.ClassName}) HP: {player.CurrentHealth:F2}/{player.MaxHealth:F2}");
+        Console.WriteLine($"Spieler: {player.Name,-12} ({player.Class.ClassName,-7}) HP: {player.CurrentHealth:F2}/{player.MaxHealth:F2}");
 
         foreach (var enemie in fight.Enemies)
-            Console.WriteLine($"Gegner: {enemie.Name} ({enemie.Class.ClassName}) HP: {enemie.CurrentHealth:F2}/{enemie.MaxHealth:F2}");
+            Console.WriteLine($"Gegner:  {enemie.Name,-12} ({enemie.Class.ClassName,-7}) HP: {enemie.CurrentHealth:F2}/{enemie.MaxHealth:F2}");
 
         Console.WriteLine();
         Console.WriteLine("----------");
@@ -34,11 +34,10 @@ class FightMenu : Menu
     public FightMenu(GameSave gameSave)
     {
         Random rnd = new Random();
-
         while (!gameSave.Fight.isGameFinished)
         {
             var historyEntry = gameSave.Fight.ApplyStatusEffects();
-            EnemyGenerator enemyGenerator = new EnemyGenerator(new Ork(), 1, gameSave.Fight);
+            EnemyGenerator enemyGenerator = new EnemyGenerator(new Ork(), rnd.Next(1, 4), gameSave.Fight);
             if (gameSave.Fight.isLevelFinished)
                 gameSave.Fight.CreateNewEnemies(enemyGenerator);
             DisplayEnteties(gameSave.Fight.Player, gameSave.Fight);
@@ -79,7 +78,7 @@ class FightMenu : Menu
     {
         Console.WriteLine("Der/Die Gegner ist/sind am Zug.");
         Console.WriteLine();
-        var historyEntrys = gameSave.Fight.EnemyMoveForRound(gameSave);
+        var historyEntrys = gameSave.Fight.EnemyMove(gameSave);
         foreach (var entry in historyEntrys)
             PrintHistoryEntry(entry, gameSave.Fight);
     }
@@ -97,7 +96,7 @@ class FightMenu : Menu
             PrintMenuPlayerMove(gameSave);
         }
 
-        historyEntry = gameSave.Fight.PlayerMoveForRound(choice, gameSave);
+        historyEntry = gameSave.Fight.PlayerMove(choice, gameSave);
         PrintHistoryEntry(historyEntry, gameSave.Fight);
     }
 
@@ -178,7 +177,7 @@ class FightMenu : Menu
         var availableTargets = gameSave.Fight.GetAvailableTargets(action);
 
         CastInputToEnum(choiceNumber);
-        OpenFleeOrUseItemMenu(action, gameSave, out noItemUsed, out choice);
+        FleeOrOpenUseItemMenu(action, gameSave, out noItemUsed, out choice);
 
         if (!noItemUsed)
         {
@@ -212,7 +211,7 @@ class FightMenu : Menu
     /// <param name="fight"></param>
     /// <param name="noItemUsed"></param>
     /// <param name="choice"></param>
-    private void OpenFleeOrUseItemMenu(ActivePlayerActionEnum action, GameSave gameSave, out bool noItemUsed, out PlayerChoice choice)
+    private void FleeOrOpenUseItemMenu(ActivePlayerActionEnum action, GameSave gameSave, out bool noItemUsed, out PlayerChoice choice)
     {
         noItemUsed = false;
         choice = null;
